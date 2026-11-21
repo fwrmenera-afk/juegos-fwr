@@ -1,0 +1,3495 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Las Crónicas de Doña Bruma — El Faro de Musgo</title>
+
+  <!-- =====================================================================
+       1. ESTILOS CSS (ESTÉTICA DE CUENTO ILUSTRADO Y DISEÑO ADAPTABLE)
+       ===================================================================== -->
+  <style>
+    :root {
+      --bg-night: #0b0f17;
+      --bg-panel: #151b26;
+      --bg-parchment: #1e2430;
+      --bg-parchment-light: #28303f;
+      --gold-primary: #d4af6a;
+      --gold-bright: #f3d79b;
+      --gold-dim: #7c653b;
+      --moss-dark: #1d3328;
+      --moss-light: #49755c;
+      --berry-accent: #7e2e46;
+      --text-main: #efe6d5;
+      --text-muted: #b3a896;
+      --font-serif: 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif;
+      --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --font-scale: 1;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      background-color: var(--bg-night);
+      background-image:
+        radial-gradient(circle at 20% 20%, rgba(45, 34, 66, 0.45) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(24, 52, 42, 0.45) 0%, transparent 50%);
+      color: var(--text-main);
+      font-family: var(--font-serif);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+    }
+
+    /* Marco principal del libro/cuento */
+    #app-frame {
+      width: 100%;
+      max-width: 1020px;
+      margin: 8px;
+      background: linear-gradient(180deg, #161c27 0%, #10151e 100%);
+      border: 2px solid var(--gold-dim);
+      border-radius: 12px;
+      box-shadow:
+        0 20px 55px rgba(0, 0, 0, 0.85),
+        inset 0 0 0 3px #0e131b,
+        inset 0 0 0 4px rgba(212, 175, 106, 0.25);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Adornos de esquinas estilo cuento antiguo */
+    .corner-ornament {
+      position: absolute;
+      width: 26px;
+      height: 26px;
+      pointer-events: none;
+      z-index: 30;
+      opacity: 0.75;
+    }
+    .corner-tl { top: 6px; left: 6px; }
+    .corner-tr { top: 6px; right: 6px; transform: scaleX(-1); }
+    .corner-bl { bottom: 6px; left: 6px; transform: scaleY(-1); }
+    .corner-br { bottom: 6px; right: 6px; transform: scale(-1); }
+
+    /* Pantallas superpuestas (Menú principal, Opciones, Créditos, Final) */
+    .screen-overlay {
+      position: relative;
+      width: 100%;
+      min-height: 620px;
+      padding: 36px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background:
+        radial-gradient(circle at 50% 35%, rgba(49, 68, 63, 0.35) 0%, rgba(13, 17, 25, 0.96) 72%);
+      z-index: 20;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Tipografía y títulos ornamentados */
+    .game-subtitle-top {
+      font-size: calc(0.9rem * var(--font-scale));
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold-primary);
+      margin-bottom: 8px;
+    }
+
+    .game-title {
+      font-size: calc(2.45rem * var(--font-scale));
+      font-weight: normal;
+      color: var(--gold-bright);
+      text-shadow: 0 3px 14px rgba(0, 0, 0, 0.9), 0 0 25px rgba(212, 175, 106, 0.25);
+      line-height: 1.15;
+      margin-bottom: 10px;
+    }
+
+    .divider-flourish {
+      width: 240px;
+      height: 18px;
+      margin: 8px auto 22px auto;
+      opacity: 0.85;
+    }
+
+    .menu-story-blurb {
+      max-width: 560px;
+      font-size: calc(1.02rem * var(--font-scale));
+      line-height: 1.6;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+      font-style: italic;
+    }
+
+    /* Botones estilo cuento ilustrado */
+    .story-btn {
+      background: linear-gradient(180deg, #262f3e 0%, #19202b 100%);
+      color: var(--text-main);
+      border: 1px solid var(--gold-dim);
+      border-radius: 6px;
+      padding: 12px 26px;
+      font-family: var(--font-serif);
+      font-size: calc(1.05rem * var(--font-scale));
+      letter-spacing: 0.6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 44px;
+    }
+
+    .story-btn:hover:not(:disabled) {
+      border-color: var(--gold-bright);
+      color: var(--gold-bright);
+      background: linear-gradient(180deg, #313d50 0%, #1f2735 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.6), 0 0 12px rgba(212, 175, 106, 0.2);
+    }
+
+    .story-btn:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+
+    .story-btn:disabled {
+      opacity: 0.42;
+      cursor: not-allowed;
+      border-color: #3a3f4b;
+      color: #7d828d;
+    }
+
+    .story-btn.primary {
+      background: linear-gradient(180deg, #354c3e 0%, #203127 100%);
+      border-color: var(--gold-primary);
+    }
+
+    .story-btn.primary:hover:not(:disabled) {
+      background: linear-gradient(180deg, #425f4d 0%, #283d31 100%);
+    }
+
+    .story-btn.danger {
+      background: linear-gradient(180deg, #542332 0%, #361520 100%);
+      border-color: #a65c72;
+    }
+
+    .menu-btn-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      max-width: 310px;
+    }
+
+    /* Panel de Opciones y Créditos */
+    .parchment-card {
+      background: rgba(24, 30, 41, 0.95);
+      border: 1px solid var(--gold-dim);
+      border-radius: 10px;
+      padding: 20px 26px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65);
+      text-align: left;
+    }
+
+    .option-row {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(212, 175, 106, 0.16);
+    }
+
+    .option-row:last-of-type {
+      border-bottom: none;
+      margin-bottom: 10px;
+    }
+
+    .option-label-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: calc(1rem * var(--font-scale));
+      color: var(--gold-bright);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--gold-primary);
+      cursor: pointer;
+      height: 8px;
+      background: #10151e;
+      border-radius: 4px;
+    }
+
+    .segmented-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .seg-btn {
+      flex: 1;
+      padding: 8px 10px;
+      background: #121721;
+      border: 1px solid var(--gold-dim);
+      color: var(--text-muted);
+      border-radius: 5px;
+      font-family: var(--font-serif);
+      font-size: calc(0.92rem * var(--font-scale));
+      cursor: pointer;
+    }
+
+    .seg-btn.active {
+      background: #2c3c33;
+      border-color: var(--gold-bright);
+      color: var(--gold-bright);
+    }
+
+    /* =====================================================================
+       INTERFAZ DURANTE LA PARTIDA
+       ===================================================================== */
+    #game-view {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    /* Barra superior discreta */
+    #top-hud {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 18px;
+      background: linear-gradient(180deg, #1b2230 0%, #131822 100%);
+      border-bottom: 1px solid rgba(212, 175, 106, 0.3);
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .room-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #room-title {
+      font-size: calc(1.12rem * var(--font-scale));
+      color: var(--gold-bright);
+      letter-spacing: 0.4px;
+    }
+
+    #hover-hint {
+      font-size: calc(0.9rem * var(--font-scale));
+      color: var(--text-muted);
+      font-style: italic;
+      min-height: 1.2em;
+    }
+
+    .hud-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hud-mini-btn {
+      padding: 7px 14px;
+      font-size: calc(0.9rem * var(--font-scale));
+      min-height: 36px;
+    }
+
+    /* Contenedor del escenario Canvas (Fijo 16:9 responsivo sin scroll) */
+    #stage-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #080b10;
+      overflow: hidden;
+    }
+
+    #game-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: crosshair;
+    }
+
+    /* Telón de transición suave entre habitaciones */
+    #fade-curtain {
+      position: absolute;
+      inset: 0;
+      background: #070a0f;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.42s ease-in-out;
+      z-index: 12;
+    }
+
+    #fade-curtain.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* Cuadro de diálogo y narración superpuesto en la zona inferior del lienzo */
+    #dialogue-box {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 14px;
+      background: rgba(17, 22, 31, 0.94);
+      border: 1px solid var(--gold-primary);
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.85), inset 0 0 0 1px rgba(243, 215, 155, 0.15);
+      z-index: 15;
+      cursor: pointer;
+    }
+
+    #dialogue-portrait {
+      width: 54px;
+      height: 54px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      border: 1px solid var(--gold-dim);
+      background: radial-gradient(circle, #2a3444 0%, #141922 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    #dialogue-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    #dialogue-speaker {
+      font-size: calc(0.86rem * var(--font-scale));
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--gold-primary);
+      margin-bottom: 3px;
+    }
+
+    #dialogue-text {
+      font-size: calc(0.98rem * var(--font-scale));
+      line-height: 1.42;
+      color: var(--text-main);
+    }
+
+    #dialogue-next-hint {
+      font-size: calc(0.82rem * var(--font-scale));
+      color: var(--gold-bright);
+      white-space: nowrap;
+      padding: 4px 10px;
+      border: 1px solid rgba(212, 175, 106, 0.35);
+      border-radius: 4px;
+      background: rgba(212, 175, 106, 0.08);
+    }
+
+    /* Barra inferior de Inventario y Descripción */
+    #bottom-panel {
+      background: linear-gradient(180deg, #161d29 0%, #10151e 100%);
+      border-top: 1px solid rgba(212, 175, 106, 0.32);
+      padding: 12px 16px;
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .inventory-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .inventory-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .inventory-title {
+      font-size: calc(0.9rem * var(--font-scale));
+      color: var(--gold-primary);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+
+    #active-item-banner {
+      font-size: calc(0.84rem * var(--font-scale));
+      color: var(--gold-bright);
+      background: rgba(73, 117, 92, 0.28);
+      border: 1px solid rgba(116, 177, 142, 0.5);
+      padding: 2px 9px;
+      border-radius: 4px;
+    }
+
+    #inventory-slots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 58px;
+      align-items: center;
+    }
+
+    .inv-slot {
+      width: 56px;
+      height: 56px;
+      background: radial-gradient(circle at 50% 40%, #232b3a 0%, #131821 100%);
+      border: 1px solid var(--gold-dim);
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.16s ease;
+    }
+
+    .inv-slot:hover {
+      border-color: var(--gold-bright);
+      transform: translateY(-2px);
+    }
+
+    .inv-slot.selected {
+      border: 2px solid var(--gold-bright);
+      box-shadow: 0 0 14px rgba(243, 215, 155, 0.45), inset 0 0 10px rgba(212, 175, 106, 0.25);
+      background: radial-gradient(circle at 50% 40%, #344156 0%, #1b2432 100%);
+    }
+
+    .inv-slot.combine-target {
+      border: 2px dashed #7ee8fa;
+      animation: pulseTarget 1.1s infinite alternate;
+    }
+
+    @keyframes pulseTarget {
+      from { box-shadow: 0 0 4px rgba(126, 232, 250, 0.3); }
+      to { box-shadow: 0 0 12px rgba(126, 232, 250, 0.75); }
+    }
+
+    .inv-empty-note {
+      font-size: calc(0.9rem * var(--font-scale));
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    /* Panel de inspección y acciones del objeto seleccionado */
+    .item-inspector {
+      background: rgba(13, 17, 24, 0.75);
+      border: 1px solid rgba(212, 175, 106, 0.22);
+      border-radius: 7px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    #inspector-name {
+      font-size: calc(0.96rem * var(--font-scale));
+      color: var(--gold-bright);
+      font-weight: bold;
+    }
+
+    #inspector-desc {
+      font-size: calc(0.88rem * var(--font-scale));
+      color: var(--text-muted);
+      line-height: 1.38;
+    }
+
+    .inspector-btns {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .tiny-btn {
+      padding: 5px 10px;
+      font-size: calc(0.82rem * var(--font-scale));
+      min-height: 30px;
+      border-radius: 4px;
+    }
+
+    /* Modales internos (Pausa, Puzzle del Relicario, Confirmaciones) */
+    .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(7, 10, 16, 0.82);
+      backdrop-filter: blur(2px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 25;
+    }
+
+    .modal-card {
+      background: linear-gradient(180deg, #1d2432 0%, #141923 100%);
+      border: 2px solid var(--gold-primary);
+      border-radius: 10px;
+      padding: 24px;
+      width: 100%;
+      max-width: 410px;
+      text-align: center;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.9);
+    }
+
+    .modal-title {
+      font-size: calc(1.35rem * var(--font-scale));
+      color: var(--gold-bright);
+      margin-bottom: 10px;
+    }
+
+    .modal-body-text {
+      font-size: calc(0.95rem * var(--font-scale));
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+
+    /* Ruedas del Puzzle de Código Numérico */
+    .code-wheels-row {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin: 18px 0 22px 0;
+    }
+
+    .wheel-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .wheel-arrow {
+      width: 46px;
+      height: 36px;
+      background: #232c3d;
+      border: 1px solid var(--gold-dim);
+      color: var(--gold-bright);
+      border-radius: 5px;
+      font-size: 1.1rem;
+      cursor: pointer;
+    }
+
+    .wheel-arrow:hover {
+      border-color: var(--gold-bright);
+      background: #2f3b52;
+    }
+
+    .wheel-digit {
+      width: 54px;
+      height: 62px;
+      background: #0d1118;
+      border: 2px solid var(--gold-primary);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      color: var(--gold-bright);
+      box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.85);
+    }
+
+    .modal-actions-row {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .feedback-toast {
+      margin-top: 10px;
+      font-size: calc(0.88rem * var(--font-scale));
+      color: #8ee0b1;
+      min-height: 1.2em;
+    }
+
+    /* Adaptación responsiva para dispositivos móviles y tabletas */
+    @media (max-width: 780px) {
+      #app-frame {
+        margin: 0;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        min-height: 100vh;
+      }
+
+      .game-title {
+        font-size: calc(1.85rem * var(--font-scale));
+      }
+
+      #bottom-panel {
+        grid-template-columns: 1fr;
+        padding: 10px 12px;
+      }
+
+      #dialogue-box {
+        left: 8px;
+        right: 8px;
+        bottom: 8px;
+        padding: 10px 12px;
+        gap: 10px;
+      }
+
+      #dialogue-portrait {
+        width: 42px;
+        height: 42px;
+      }
+
+      .inv-slot {
+        width: 50px;
+        height: 50px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =====================================================================
+       2. ESTRUCTURA HTML DEL JUEGO
+       ===================================================================== -->
+  <div id="app-frame">
+    <!-- Adornos vectoriales de las 4 esquinas -->
+    <svg class="corner-ornament corner-tl" viewBox="0 0 32 32" fill="none">
+      <path d="M2 30V6C2 3.79086 3.79086 2 6 2H30" stroke="#d4af6a" stroke-width="2"/>
+      <path d="M6 22V8C6 6.89543 6.89543 6 8 6H22" stroke="#7c653b" stroke-width="1"/>
+      <circle cx="6" cy="6" r="2.5" fill="#f3d79b"/>
+    </svg>
+    <svg class="corner-ornament corner-tr" viewBox="0 0 32 32" fill="none">
+      <path d="M2 30V6C2 3.79086 3.79086 2 6 2H30" stroke="#d4af6a" stroke-width="2"/>
+      <path d="M6 22V8C6 6.89543 6.89543 6 8 6H22" stroke="#7c653b" stroke-width="1"/>
+      <circle cx="6" cy="6" r="2.5" fill="#f3d79b"/>
+    </svg>
+    <svg class="corner-ornament corner-bl" viewBox="0 0 32 32" fill="none">
+      <path d="M2 30V6C2 3.79086 3.79086 2 6 2H30" stroke="#d4af6a" stroke-width="2"/>
+      <path d="M6 22V8C6 6.89543 6.89543 6 8 6H22" stroke="#7c653b" stroke-width="1"/>
+      <circle cx="6" cy="6" r="2.5" fill="#f3d79b"/>
+    </svg>
+    <svg class="corner-ornament corner-br" viewBox="0 0 32 32" fill="none">
+      <path d="M2 30V6C2 3.79086 3.79086 2 6 2H30" stroke="#d4af6a" stroke-width="2"/>
+      <path d="M6 22V8C6 6.89543 6.89543 6 8 6H22" stroke="#7c653b" stroke-width="1"/>
+      <circle cx="6" cy="6" r="2.5" fill="#f3d79b"/>
+    </svg>
+
+    <!-- PANTALLA 1: MENÚ PRINCIPAL -->
+    <section id="main-menu-screen" class="screen-overlay">
+      <!-- Emblema ilustrado SVG de Doña Bruma -->
+      <svg width="88" height="88" viewBox="0 0 96 96" fill="none" style="margin-bottom:10px;">
+        <circle cx="48" cy="48" r="44" fill="#17202c" stroke="#d4af6a" stroke-width="1.5"/>
+        <circle cx="48" cy="48" r="39" stroke="#7c653b" stroke-width="1" stroke-dasharray="3 3"/>
+        <!-- Orejas -->
+        <circle cx="33" cy="34" r="10" fill="#8b7d7b" stroke="#2d2626" stroke-width="1.5"/>
+        <circle cx="33" cy="34" r="6" fill="#c78d94"/>
+        <circle cx="63" cy="34" r="10" fill="#8b7d7b" stroke="#2d2626" stroke-width="1.5"/>
+        <circle cx="63" cy="34" r="6" fill="#c78d94"/>
+        <!-- Capucha de viajera -->
+        <path d="M26 52C26 35 36 26 48 26C60 26 70 35 70 52L74 68H22L26 52Z" fill="#7e2e46" stroke="#d4af6a" stroke-width="1.2"/>
+        <!-- Rostro -->
+        <path d="M35 46C35 39 41 35 48 35C55 35 61 39 61 46C61 53 54 60 48 62C42 60 35 53 35 46Z" fill="#a89b98"/>
+        <!-- Ojos y nariz -->
+        <circle cx="42" cy="46" r="2.4" fill="#151820"/>
+        <circle cx="42.7" cy="45.2" r="0.8" fill="#ffffff"/>
+        <circle cx="54" cy="46" r="2.4" fill="#151820"/>
+        <circle cx="54.7" cy="45.2" r="0.8" fill="#ffffff"/>
+        <circle cx="48" cy="56" r="2.3" fill="#dfa0a6"/>
+        <!-- Bigotes -->
+        <path d="M37 54L27 52M37 57L27 58M59 54L69 52M59 57L69 58" stroke="#efe6d5" stroke-width="1" stroke-linecap="round"/>
+        <!-- Farolito dorado -->
+        <circle cx="72" cy="70" r="6" fill="rgba(243,215,155,0.28)"/>
+        <rect x="69" y="66" width="6" height="8" rx="2" fill="#f3d79b" stroke="#7c653b" stroke-width="1"/>
+      </svg>
+
+      <div class="game-subtitle-top">Aventura Gráfica Point-and-Click</div>
+      <h1 class="game-title">Las Crónicas de Doña Bruma</h1>
+      <div class="game-subtitle-top" style="font-size:calc(0.85rem * var(--font-scale)); color:#b3a896; letter-spacing:2px;">El Faro de Musgo</div>
+
+      <svg class="divider-flourish" viewBox="0 0 240 18" fill="none">
+        <path d="M10 9H98M142 9H230" stroke="#7c653b" stroke-width="1.2"/>
+        <path d="M120 2L127 9L120 16L113 9L120 2Z" fill="#d4af6a"/>
+        <circle cx="104" cy="9" r="2" fill="#d4af6a"/>
+        <circle cx="136" cy="9" r="2" fill="#d4af6a"/>
+      </svg>
+
+      <p class="menu-story-blurb">
+        Con su bolsita de cuero al hombro y pasos silenciosos, la pequeña Doña Bruma se adentra en el Bosque del Susurro Nocturno para despertar el antiguo Faro de Esporas antes de que la niebla cubra los senderos.
+      </p>
+
+      <div class="menu-btn-stack">
+        <button id="btn-new-game" class="story-btn primary">Nueva partida</button>
+        <button id="btn-continue-game" class="story-btn" disabled>Continuar</button>
+        <button id="btn-open-options" class="story-btn">Opciones</button>
+        <button id="btn-open-credits" class="story-btn">Créditos</button>
+      </div>
+    </section>
+
+    <!-- PANTALLA 2: OPCIONES -->
+    <section id="options-screen" class="screen-overlay hidden">
+      <h2 class="game-title" style="font-size:calc(1.9rem * var(--font-scale)); margin-bottom:16px;">Opciones del Viaje</h2>
+      <div class="parchment-card">
+        <div class="option-row">
+          <div class="option-label-line">
+            <span>Música de fondo</span>
+            <button id="btn-toggle-music" class="story-btn tiny-btn primary">Activada</button>
+          </div>
+          <div class="option-label-line" style="font-size:calc(0.88rem * var(--font-scale)); color:var(--text-muted); margin-top:4px;">
+            <label for="music-volume-slider">Volumen de la música</label>
+            <span id="music-volume-label">55%</span>
+          </div>
+          <input type="range" id="music-volume-slider" min="0" max="100" value="55" />
+        </div>
+
+        <div class="option-row">
+          <div class="option-label-line">
+            <span>Efectos de sonido</span>
+            <button id="btn-toggle-sound" class="story-btn tiny-btn primary">Activados</button>
+          </div>
+          <span style="font-size:calc(0.84rem * var(--font-scale)); color:var(--text-muted);">
+            Activa o silencia los pasos, campanillas mágicas y sonidos al interactuar.
+          </span>
+        </div>
+
+        <div class="option-row">
+          <div class="option-label-line">
+            <label for="volume-slider">Volumen general</label>
+            <span id="volume-value-label">70%</span>
+          </div>
+          <input type="range" id="volume-slider" min="0" max="100" value="70" />
+        </div>
+
+        <div class="option-row">
+          <div class="option-label-line">
+            <span>Tamaño de lectura</span>
+          </div>
+          <div class="segmented-group" id="text-size-group">
+            <button class="seg-btn active" data-scale="1">Normal</button>
+            <button class="seg-btn" data-scale="1.12">Grande</button>
+            <button class="seg-btn" data-scale="1.24">Muy grande</button>
+          </div>
+        </div>
+
+        <div style="text-align:center; margin-top:14px;">
+          <button id="btn-close-options" class="story-btn primary">Regresar</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANTALLA 3: CRÉDITOS -->
+    <section id="credits-screen" class="screen-overlay hidden">
+      <h2 class="game-title" style="font-size:calc(1.9rem * var(--font-scale)); margin-bottom:18px;">Crónicas y Autoría</h2>
+      <div class="parchment-card" style="text-align:center;">
+        <p style="font-size:calc(1.02rem * var(--font-scale)); color:var(--gold-bright); margin-bottom:10px;">
+          Las Crónicas de Doña Bruma: El Faro de Musgo
+        </p>
+        <p style="font-size:calc(0.94rem * var(--font-scale)); color:var(--text-muted); line-height:1.6; margin-bottom:14px;">
+          Una aventura gráfica clásica diseñada con ilustración programática en HTML5 Canvas, gráficos vectoriales originales y síntesis de audio en tiempo real.
+        </p>
+        <p style="font-size:calc(0.9rem * var(--font-scale)); color:var(--text-main); margin-bottom:20px;">
+          Dedicado a los pequeños viajeros pacientes que observan cada raíz, escuchan el viento entre los hongos y nunca olvidan su bolsita.
+        </p>
+        <button id="btn-close-credits" class="story-btn primary">Volver al menú</button>
+      </div>
+    </section>
+
+    <!-- PANTALLA 4: ESCENA FINAL DE LA AVENTURA -->
+    <section id="ending-screen" class="screen-overlay hidden">
+      <svg width="92" height="92" viewBox="0 0 96 96" fill="none" style="margin-bottom:12px;">
+        <circle cx="48" cy="48" r="42" fill="rgba(243,215,155,0.12)" stroke="#f3d79b" stroke-width="1.5"/>
+        <path d="M48 14L53 38L77 43L53 48L48 72L43 48L19 43L43 38L48 14Z" fill="#f3d79b"/>
+        <circle cx="48" cy="43" r="7" fill="#ffffff"/>
+      </svg>
+      <div class="game-subtitle-top">Aventura Completada</div>
+      <h2 class="game-title" style="font-size:calc(2.1rem * var(--font-scale));">La Luz Regresa al Bosque</h2>
+      <div class="parchment-card" style="text-align:center; max-width:540px;">
+        <p style="font-size:calc(1rem * var(--font-scale)); color:var(--text-main); line-height:1.65; margin-bottom:14px;">
+          El Cristal Corazón palpita con el polvo de espora dorada. Un haz cálido y sereno atraviesa la copa de los árboles centenarios, disipando la bruma fría que cubría los senderos.
+        </p>
+        <p style="font-size:calc(0.96rem * var(--font-scale)); color:var(--text-muted); line-height:1.6; font-style:italic; margin-bottom:22px;">
+          Doña Bruma ajusta las correas de su bolsita, sonríe bajo su capucha color ciruela y contempla cómo las luciérnagas vuelven a danzar sobre el musgo. Los viajeros del bosque ya tienen un faro que los guíe a casa.
+        </p>
+        <div class="modal-actions-row">
+          <button id="btn-ending-menu" class="story-btn primary">Volver al menú principal</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANTALLA 5: VISTA PRINCIPAL DEL JUEGO -->
+    <main id="game-view" class="hidden">
+      <!-- Barra superior de estado -->
+      <header id="top-hud">
+        <div class="room-badge">
+          <span id="room-title">El Claro del Tocón Antiguo</span>
+          <span id="hover-hint">Haz clic en el sendero para caminar o examinar el entorno.</span>
+        </div>
+        <div class="hud-actions">
+          <button id="btn-pause" class="story-btn hud-mini-btn">Pausa</button>
+        </div>
+      </header>
+
+      <!-- Escenario fijo 16:9 -->
+      <div id="stage-wrapper">
+        <canvas id="game-canvas" width="960" height="540"></canvas>
+        <div id="fade-curtain"></div>
+
+        <!-- Cuadro de diálogo narrativo -->
+        <div id="dialogue-box" class="hidden" role="button" tabindex="0" aria-label="Continuar diálogo">
+          <div id="dialogue-portrait"></div>
+          <div id="dialogue-content">
+            <div id="dialogue-speaker">Doña Bruma</div>
+            <div id="dialogue-text">...</div>
+          </div>
+          <div id="dialogue-next-hint">Continuar</div>
+        </div>
+      </div>
+
+      <!-- Panel inferior: Inventario y descripción de objetos -->
+      <footer id="bottom-panel">
+        <div class="inventory-section">
+          <div class="inventory-header">
+            <span class="inventory-title">Bolsita de Viaje</span>
+            <span id="active-item-banner" class="hidden"></span>
+          </div>
+          <div id="inventory-slots">
+            <span class="inv-empty-note">La bolsita aún está vacía.</span>
+          </div>
+        </div>
+
+        <div class="item-inspector">
+          <div>
+            <div id="inspector-name">Sin objeto seleccionado</div>
+            <div id="inspector-desc">Haz clic en un objeto recogido en tu bolsita para examinarlo, usarlo en el escenario o combinarlo con otro.</div>
+          </div>
+          <div class="inspector-btns" id="inspector-actions"></div>
+        </div>
+      </footer>
+    </main>
+
+    <!-- MODAL 1: PUZZLE DE CERRADURA NUMÉRICA DEL RELICARIO -->
+    <div id="code-puzzle-modal" class="modal-backdrop hidden">
+      <div class="modal-card">
+        <h3 class="modal-title">Relicario del Guardián</h3>
+        <p class="modal-body-text">
+          Tres ruedas de bronce antiguo custodian el interior del relicario. Alinea los números correctos según las pistas del bosque.
+        </p>
+        <div class="code-wheels-row">
+          <div class="wheel-col">
+            <button class="wheel-arrow" data-wheel="0" data-dir="1" aria-label="Subir primer dígito">+</button>
+            <div class="wheel-digit" id="wheel-val-0">0</div>
+            <button class="wheel-arrow" data-wheel="0" data-dir="-1" aria-label="Bajar primer dígito">-</button>
+          </div>
+          <div class="wheel-col">
+            <button class="wheel-arrow" data-wheel="1" data-dir="1" aria-label="Subir segundo dígito">+</button>
+            <div class="wheel-digit" id="wheel-val-1">0</div>
+            <button class="wheel-arrow" data-wheel="1" data-dir="-1" aria-label="Bajar segundo dígito">-</button>
+          </div>
+          <div class="wheel-col">
+            <button class="wheel-arrow" data-wheel="2" data-dir="1" aria-label="Subir tercer dígito">+</button>
+            <div class="wheel-digit" id="wheel-val-2">0</div>
+            <button class="wheel-arrow" data-wheel="2" data-dir="-1" aria-label="Bajar tercer dígito">-</button>
+          </div>
+        </div>
+        <div class="modal-actions-row">
+          <button id="btn-submit-code" class="story-btn primary">Girar pestillo</button>
+          <button id="btn-cancel-code" class="story-btn">Cerrar</button>
+        </div>
+        <div id="code-feedback" class="feedback-toast"></div>
+      </div>
+    </div>
+
+    <!-- MODAL 2: MENÚ DE PAUSA -->
+    <div id="pause-modal" class="modal-backdrop hidden">
+      <div class="modal-card">
+        <h3 class="modal-title">Pausa en el Sendero</h3>
+        <p class="modal-body-text">
+          Doña Bruma detiene su marcha un instante bajo la sombra de los árboles.
+        </p>
+        <div class="menu-btn-stack" style="margin:0 auto;">
+          <button id="btn-resume-game" class="story-btn primary">Regresar al juego</button>
+          <button id="btn-save-game" class="story-btn">Guardar partida</button>
+          <button id="btn-pause-options" class="story-btn">Opciones</button>
+          <button id="btn-exit-to-menu" class="story-btn danger">Salir al menú principal</button>
+        </div>
+        <div id="pause-feedback" class="feedback-toast"></div>
+      </div>
+    </div>
+
+    <!-- MODAL 3: CONFIRMACIÓN DE SALIDA SIN GUARDAR -->
+    <div id="confirm-exit-modal" class="modal-backdrop hidden">
+      <div class="modal-card">
+        <h3 class="modal-title">Progreso sin guardar</h3>
+        <p class="modal-body-text">
+          Has realizado avances desde la última vez que guardaste tu diario de viaje. ¿Qué deseas hacer?
+        </p>
+        <div class="menu-btn-stack" style="margin:0 auto;">
+          <button id="btn-save-and-exit" class="story-btn primary">Guardar y salir al menú</button>
+          <button id="btn-discard-and-exit" class="story-btn danger">Salir sin guardar</button>
+          <button id="btn-cancel-exit" class="story-btn">Seguir jugando</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       3. JAVASCRIPT: LÓGICA COMPLETA DEL VIDEOJUEGO
+       ===================================================================== -->
+  <script>
+    (() => {
+      'use strict';
+
+      /* -------------------------------------------------------------------
+         SECCIÓN A: MOTOR DE AUDIO SINTETIZADO (MÚSICA DEL BOSQUE Y EFECTOS)
+         ------------------------------------------------------------------- */
+      const SoundEngine = {
+        ctx: null,
+        sfxEnabled: true,
+        musicEnabled: true,
+        volume: 0.7,
+        musicVolume: 0.55,
+        musicMasterGain: null,
+        musicTimer: null,
+        musicStep: 0,
+        musicStarted: false,
+        padOscs: [],
+
+        init() {
+          if (!this.ctx) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (AudioCtx) {
+              this.ctx = new AudioCtx();
+            }
+          }
+          if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => {});
+          }
+          if (this.ctx && this.musicEnabled && !this.musicStarted) {
+            this.startMusic();
+          }
+        },
+
+        // Calcula la ganancia suave de la música para que nunca tape los efectos
+        getEffectiveMusicGain() {
+          if (!this.musicEnabled || this.volume <= 0 || this.musicVolume <= 0) {
+            return 0.0001;
+          }
+          // Tope máximo calibrado (0.095) muy por debajo de los efectos (0.14 - 0.24)
+          return Math.max(0.0001, this.volume * this.musicVolume * 0.095);
+        },
+
+        updateMusicGain() {
+          if (!this.ctx || !this.musicMasterGain) return;
+          const target = this.getEffectiveMusicGain();
+          const now = this.ctx.currentTime;
+          this.musicMasterGain.gain.cancelScheduledValues(now);
+          this.musicMasterGain.gain.setTargetAtTime(target, now, 0.08);
+        },
+
+        startMusic() {
+          if (!this.ctx || this.musicStarted || !this.musicEnabled) return;
+          this.musicStarted = true;
+
+          // Bus maestro de música con filtro paso-bajos cálido
+          this.musicMasterGain = this.ctx.createGain();
+          this.musicMasterGain.gain.setValueAtTime(0.0001, this.ctx.currentTime);
+          this.musicMasterGain.gain.exponentialRampToValueAtTime(
+            this.getEffectiveMusicGain(),
+            this.ctx.currentTime + 1.4
+          );
+
+          const warmFilter = this.ctx.createBiquadFilter();
+          warmFilter.type = 'lowpass';
+          warmFilter.frequency.setValueAtTime(680, this.ctx.currentTime);
+
+          this.musicMasterGain.connect(warmFilter);
+          warmFilter.connect(this.ctx.destination);
+
+          // Colchón armónico muy tenue (viento suave entre árboles: Re3 y La3)
+          const padFreqs = [146.83, 220.0];
+          this.padOscs = padFreqs.map((freq, i) => {
+            const osc = this.ctx.createOscillator();
+            const g = this.ctx.createGain();
+            osc.type = i === 0 ? 'sine' : 'triangle';
+            osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+            g.gain.setValueAtTime(i === 0 ? 0.16 : 0.07, this.ctx.currentTime);
+            osc.connect(g);
+            g.connect(this.musicMasterGain);
+            osc.start();
+            return osc;
+          });
+
+          // Melodía nocturna de arpa/celesta en Re menor / Dórico (encantadora y melancólica)
+          const forestMelody = [
+            293.66, 349.23, 440.00, 523.25, 440.00, 349.23, 329.63, 293.66, // Dm7
+            233.08, 293.66, 349.23, 440.00, 587.33, 440.00, 349.23, 329.63, // Bbmaj7
+            261.63, 329.63, 392.00, 493.88, 440.00, 392.00, 329.63, 293.66, // Cmaj7 -> Dm
+            220.00, 261.63, 329.63, 392.00, 440.00, 329.63, 293.66, 0       // Am7 con respiro
+          ];
+
+          const playNextNote = () => {
+            if (!this.ctx || !this.musicStarted || !this.musicEnabled || document.hidden) return;
+            const freq = forestMelody[this.musicStep % forestMelody.length];
+            this.musicStep++;
+
+            if (freq > 0) {
+              const now = this.ctx.currentTime;
+              const osc = this.ctx.createOscillator();
+              const noteGain = this.ctx.createGain();
+
+              osc.type = 'sine';
+              osc.frequency.setValueAtTime(freq, now);
+
+              noteGain.gain.setValueAtTime(0.0001, now);
+              noteGain.gain.exponentialRampToValueAtTime(0.32, now + 0.09);
+              noteGain.gain.exponentialRampToValueAtTime(0.0001, now + 2.1);
+
+              osc.connect(noteGain);
+              noteGain.connect(this.musicMasterGain);
+
+              osc.start(now);
+              osc.stop(now + 2.2);
+            }
+          };
+
+          playNextNote();
+          this.musicTimer = setInterval(playNextNote, 760);
+        },
+
+        stopMusic() {
+          if (this.musicTimer) {
+            clearInterval(this.musicTimer);
+            this.musicTimer = null;
+          }
+          for (const osc of this.padOscs) {
+            try { osc.stop(); } catch (_) {}
+          }
+          this.padOscs = [];
+          this.musicStarted = false;
+        },
+
+        playTone(freq, duration, type = 'sine', gainMult = 0.25, delay = 0) {
+          if (!this.sfxEnabled || this.volume <= 0) return;
+          this.init();
+          if (!this.ctx) return;
+
+          const now = this.ctx.currentTime + delay;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, now);
+
+          const peakGain = Math.max(0.001, this.volume * gainMult);
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.exponentialRampToValueAtTime(peakGain, now + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start(now);
+          osc.stop(now + duration + 0.03);
+        },
+
+        playStep() {
+          // Paso suave sobre tierra y musgo
+          const base = 135 + Math.random() * 35;
+          this.playTone(base, 0.07, 'triangle', 0.11, 0);
+        },
+
+        playClick() {
+          this.playTone(420, 0.08, 'sine', 0.16, 0);
+        },
+
+        playPickup() {
+          this.playTone(523.25, 0.18, 'sine', 0.24, 0);
+          this.playTone(659.25, 0.22, 'sine', 0.24, 0.08);
+          this.playTone(783.99, 0.32, 'triangle', 0.22, 0.16);
+        },
+
+        playPuzzleSolved() {
+          const notes = [440, 554.37, 659.25, 880];
+          notes.forEach((n, idx) => {
+            this.playTone(n, 0.35, 'triangle', 0.26, idx * 0.11);
+          });
+        },
+
+        playError() {
+          this.playTone(190, 0.18, 'sawtooth', 0.14, 0);
+          this.playTone(155, 0.24, 'sawtooth', 0.14, 0.12);
+        },
+
+        playTransition() {
+          this.playTone(330, 0.35, 'sine', 0.15, 0);
+          this.playTone(392, 0.4, 'sine', 0.15, 0.12);
+        }
+      };
+
+      // Arrancar la música ambiental automáticamente tras la primera interacción del usuario
+      const unlockInitialAudio = () => {
+        SoundEngine.init();
+        document.removeEventListener('pointerdown', unlockInitialAudio);
+        document.removeEventListener('keydown', unlockInitialAudio);
+      };
+      document.addEventListener('pointerdown', unlockInitialAudio);
+      document.addEventListener('keydown', unlockInitialAudio);
+
+      /* -------------------------------------------------------------------
+         SECCIÓN B: DEFINICIÓN DE OBJETOS, ICONOS SVG Y RECETAS
+         ------------------------------------------------------------------- */
+      const ITEMS_DB = {
+        brass_key: {
+          id: 'brass_key',
+          name: 'Llave de Latón Antiguo',
+          desc: 'Una pequeña llave cubierta de pátina verdosa, hallada bajo las raíces del claro.',
+          svg: `<svg viewBox="0 0 48 48" width="38" height="38" fill="none">
+            <circle cx="15" cy="18" r="7" stroke="#f3d79b" stroke-width="3" fill="#4f3d1e"/>
+            <circle cx="15" cy="18" r="2.5" fill="#151b26"/>
+            <path d="M21 21L38 35M32 30L29 34M36 33L33 37" stroke="#f3d79b" stroke-width="3" stroke-linecap="round"/>
+          </svg>`
+        },
+        empty_jar: {
+          id: 'empty_jar',
+          name: 'Frasco de Cristal Vacío',
+          desc: 'Un frasco soplado a mano con cristal limpio. Ideal para guardar algo sutil y luminoso.',
+          svg: `<svg viewBox="0 0 48 48" width="38" height="38" fill="none">
+            <rect x="17" y="9" width="14" height="4" rx="1.5" fill="#9fb6c9"/>
+            <path d="M15 15C15 13.5 16.5 13 18 13H30C31.5 13 33 13.5 33 15L35 20V37C35 39.2 33.2 41 31 41H17C14.8 41 13 39.2 13 37V20L15 15Z" fill="rgba(167,216,232,0.22)" stroke="#b8e0ee" stroke-width="2"/>
+            <path d="M17 22V35" stroke="rgba(255,255,255,0.45)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>`
+        },
+        guardian_note: {
+          id: 'guardian_note',
+          name: 'Nota del Guardián',
+          desc: 'Pergamino enrollado: "Para abrir el Relicario del Santuario: 4 pétalos de luna, 2 alas de polilla, 7 gotas de rocío."',
+          readable: true,
+          fullText: 'El pergamino tiene tinta color sepia y dice: "Al viajero de corazón paciente: cuando alcances el Relicario junto al Faro, alinea sus ruedas con la cuenta del bosque: Cuatro pétalos de luna, dos alas de polilla y siete gotas de rocío (4 - 2 - 7)."',
+          svg: `<svg viewBox="0 0 48 48" width="38" height="38" fill="none">
+            <rect x="12" y="10" width="24" height="28" rx="3" fill="#d9c39e" stroke="#7c653b" stroke-width="2"/>
+            <path d="M17 17H31M17 23H31M17 29H26" stroke="#4a3723" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="31" cy="32" r="3.5" fill="#8f2d42"/>
+          </svg>`
+        },
+        firefly_jar: {
+          id: 'firefly_jar',
+          name: 'Frasco con Luciérnagas',
+          desc: 'Varias luciérnagas doradas revolotean dentro, pero sin un sello adecuado su luz escapa y se debilita.',
+          svg: `<svg viewBox="0 0 48 48" width="38" height="38" fill="none">
+            <path d="M15 15C15 13.5 16.5 13 18 13H30C31.5 13 33 13.5 33 15L35 20V37C35 39.2 33.2 41 31 41H17C14.8 41 13 39.2 13 37V20L15 15Z" fill="rgba(243,215,155,0.22)" stroke="#f3d79b" stroke-width="2"/>
+            <circle cx="21" cy="27" r="3" fill="#ffe680"/>
+            <circle cx="28" cy="32" r="2.5" fill="#ffe680"/>
+            <circle cx="25" cy="22" r="2" fill="#fff5b8"/>
+          </svg>`
+        },
+        amber_cork: {
+          id: 'amber_cork',
+          name: 'Corcho de Ámbar',
+          desc: 'Un tapón tallado en resina de ámbar milenaria. Amplifica cualquier luz que toque.',
+          svg: `<svg viewBox="0 0 48 48" width="38" height="38" fill="none">
+            <path d="M16 14H32L30 34H18L16 14Z" fill="#d9822b" stroke="#f7c46c" stroke-width="2"/>
+            <ellipse cx="24" cy="14" rx="8" ry="3" fill="#f3a847"/>
+            <circle cx="23" cy="24" r="2" fill="#fff0c2" opacity="0.75"/>
+          </svg>`
+        },
+        amber_lantern: {
+          id: 'amber_lantern',
+          name: 'Linterna de Ámbar Viva',
+          desc: 'El frasco con luciérnagas sellado con el corcho de ámbar. Irradia una luz dorada cálida y constante.',
+          svg: `<svg viewBox="0 0 48 48" width="38" height="38" fill="none">
+            <circle cx="24" cy="27" r="15" fill="rgba(255,216,115,0.28)"/>
+            <path d="M17 13H31L29 17H19L17 13Z" fill="#e69138" stroke="#f7c46c" stroke-width="1.5"/>
+            <path d="M15 18H33L35 37C35 39 33 41 31 41H17C15 41 13 39 13 37L15 18Z" fill="rgba(255,224,130,0.45)" stroke="#ffe599" stroke-width="2"/>
+            <circle cx="24" cy="28" r="5" fill="#fff7cc"/>
+          </svg>`
+        },
+        glow_mushroom: {
+          id: 'glow_mushroom',
+          name: 'Seta Luminosa',
+          desc: 'Un hongo tierno de sombrero azulado cuyas branquias guardan esporas doradas latentes.',
+          svg: `<svg viewBox="0 0 48 48" width="38" height="38" fill="none">
+            <path d="M21 26H27V38C27 39.5 25.5 40 24 40C22.5 40 21 39.5 21 38V26Z" fill="#dfd3c3"/>
+            <path d="M11 26C11 17 17 11 24 11C31 11 37 17 37 26H11Z" fill="#48759e" stroke="#9be0ff" stroke-width="2"/>
+            <circle cx="20" cy="18" r="2" fill="#ffe699"/>
+            <circle cx="28" cy="20" r="1.8" fill="#ffe699"/>
+            <circle cx="24" cy="15" r="1.4" fill="#ffe699"/>
+          </svg>`
+        },
+        spore_powder: {
+          id: 'spore_powder',
+          name: 'Polvo de Espora Dorada',
+          desc: 'Polvo fino molido en mortero de piedra. Chispea como brasas vivas al contacto con el aire.',
+          svg: `<svg viewBox="0 0 48 48" width="38" height="38" fill="none">
+            <path d="M12 34C15 24 33 24 36 34H12Z" fill="#f3c65f" stroke="#fff0b3" stroke-width="1.5"/>
+            <circle cx="20" cy="20" r="2" fill="#ffe680"/>
+            <circle cx="27" cy="17" r="1.8" fill="#ffe680"/>
+            <circle cx="24" cy="23" r="1.5" fill="#ffffff"/>
+          </svg>`
+        },
+        heart_crystal: {
+          id: 'heart_crystal',
+          name: 'Cristal Corazón del Bosque',
+          desc: 'Una gema tallada en forma de semilla estelar. Es el núcleo que da vida al Faro de Musgo.',
+          svg: `<svg viewBox="0 0 48 48" width="38" height="38" fill="none">
+            <polygon points="24,8 35,21 24,40 13,21" fill="#80d8ff" stroke="#e1f5fe" stroke-width="2"/>
+            <polygon points="24,8 29,21 24,40 19,21" fill="rgba(255,255,255,0.45)"/>
+          </svg>`
+        }
+      };
+
+      // Recetas de combinación entre objetos del inventario
+      const COMBINATIONS = [
+        {
+          itemA: 'firefly_jar',
+          itemB: 'amber_cork',
+          result: 'amber_lantern',
+          message: 'Doña Bruma ajusta el Corcho de Ámbar en la boca del frasco. Al instante, la luz de las luciérnagas se vuelve cálida, firme y dorada.'
+        }
+      ];
+
+      /* -------------------------------------------------------------------
+         SECCIÓN C: ESTADO GLOBAL Y CONFIGURACIÓN
+         ------------------------------------------------------------------- */
+      const SAVE_KEY = 'dona_bruma_save_v1';
+      const SETTINGS_KEY = 'dona_bruma_settings_v1';
+
+      function createFreshGameState() {
+        return {
+          currentRoom: 'claro',
+          player: {
+            x: 240,
+            y: 430,
+            facing: 1
+          },
+          inventory: [],
+          pickedUp: {},
+          flags: {
+            introShown: false,
+            stumpUnlocked: false,
+            bridgeUnlocked: false,
+            reliquaryUnlocked: false,
+            crystalPlaced: false,
+            beaconLit: false
+          }
+        };
+      }
+
+      let gameState = createFreshGameState();
+      let hasUnsavedChanges = false;
+      let isPaused = false;
+      let isTransitioning = false;
+
+      // Estado de movimiento en tiempo real
+      const movement = {
+        active: false,
+        targetX: 240,
+        targetY: 430,
+        speed: 195, // píxeles por segundo
+        walkCycle: 0,
+        stepSoundTimer: 0,
+        pendingInteractable: null
+      };
+
+      // Estado de interfaz e inventario
+      let selectedItemId = null;
+      let combineSourceItemId = null;
+      let hoveredInteractable = null;
+      let activeDialogueQueue = [];
+      let onDialogueComplete = null;
+      let codeDigits = [0, 0, 0];
+
+      /* -------------------------------------------------------------------
+         SECCIÓN D: DEFINICIÓN DE HABITACIONES, OBSTÁCULOS E INTERACCIONES
+         ------------------------------------------------------------------- */
+      const ROOMS = {
+        claro: {
+          id: 'claro',
+          name: 'El Claro del Tocón Antiguo',
+          // Polígono convexo/simple de zona transitable en coordenadas 960x540
+          walkBounds: { minX: 115, maxX: 875, minY: 365, maxY: 495 },
+          // Obstáculos rectangulares dentro de los límites transitables
+          obstacles: [
+            { x: 110, y: 350, w: 170, h: 65 } // Base del tocón antiguo
+          ],
+          interactables: [
+            {
+              id: 'mossy_root',
+              name: 'Raíz Musgosa',
+              box: { x: 325, y: 425, w: 115, h: 62 },
+              walkTo: { x: 375, y: 440 },
+              onInteract() {
+                if (!gameState.pickedUp.brass_key) {
+                  addItemToInventory('brass_key');
+                  gameState.pickedUp.brass_key = true;
+                  SoundEngine.playPickup();
+                  showDialogue([
+                    {
+                      speaker: 'Doña Bruma',
+                      text: 'Entre las hebras húmedas del musgo asoma un destello metálico... ¡Es una Llave de Latón Antiguo! La guardaré en mi bolsita.'
+                    }
+                  ]);
+                } else {
+                  showDialogue([
+                    {
+                      speaker: 'Doña Bruma',
+                      text: 'La raíz está cubierta de un musgo suave como el terciopelo, pero ya no esconde nada más.'
+                    }
+                  ]);
+                }
+              },
+              onUseItem(itemId) {
+                showDialogue([
+                  {
+                    speaker: 'Doña Bruma',
+                    text: `No veo motivo para usar ${ITEMS_DB[itemId].name} sobre esta vieja raíz.`
+                  }
+                ]);
+              }
+            },
+            {
+              id: 'carved_sign',
+              name: 'Poste Tallado del Claro',
+              box: { x: 525, y: 295, w: 72, h: 105 },
+              walkTo: { x: 555, y: 405 },
+              onInteract() {
+                SoundEngine.playClick();
+                showDialogue([
+                  {
+                    speaker: 'Inscripción en Madera',
+                    text: '"Al este aguarda el Sendero de las Luciérnagas. Más allá, sobre la colina silenciosa, duerme el Faro de Musgo."'
+                  },
+                  {
+                    speaker: 'Doña Bruma',
+                    text: 'La niebla empieza a espesarse entre los troncos. Debo encontrar la manera de reavivar ese faro.'
+                  }
+                ]);
+              },
+              onUseItem(itemId) {
+                showDialogue([
+                  {
+                    speaker: 'Doña Bruma',
+                    text: 'El poste solo ofrece indicaciones a los viajeros; no tiene cerradura ni ranura alguna.'
+                  }
+                ]);
+              }
+            },
+            {
+              id: 'ancient_stump',
+              name: 'Tocón Hueco con Portezuela',
+              box: { x: 115, y: 255, w: 155, h: 145 },
+              walkTo: { x: 285, y: 410 },
+              onInteract() {
+                if (!gameState.flags.stumpUnlocked) {
+                  SoundEngine.playClick();
+                  showDialogue([
+                    {
+                      speaker: 'Doña Bruma',
+                      text: 'Hay una pequeña puerta de roble incrustada en el tocón. Tiene un cerrojo de latón firmemente cerrado.'
+                    }
+                  ]);
+                } else if (!gameState.pickedUp.stump_loot) {
+                  addItemToInventory('empty_jar');
+                  addItemToInventory('guardian_note');
+                  gameState.pickedUp.stump_loot = true;
+                  SoundEngine.playPickup();
+                  showDialogue([
+                    {
+                      speaker: 'Doña Bruma',
+                      text: 'Dentro del hueco del tocón había un Frasco de Cristal Vacío y un pergamino enrollado: la Nota del Guardián.'
+                    }
+                  ]);
+                } else {
+                  showDialogue([
+                    {
+                      speaker: 'Doña Bruma',
+                      text: 'El compartimento del tocón ya está vacío y huele a corteza seca.'
+                    }
+                  ]);
+                }
+              },
+              onUseItem(itemId) {
+                if (itemId === 'brass_key') {
+                  if (!gameState.flags.stumpUnlocked) {
+                    gameState.flags.stumpUnlocked = true;
+                    consumeItem('brass_key');
+                    addItemToInventory('empty_jar');
+                    addItemToInventory('guardian_note');
+                    gameState.pickedUp.stump_loot = true;
+                    SoundEngine.playPuzzleSolved();
+                    showDialogue([
+                      {
+                        speaker: 'Doña Bruma',
+                        text: 'La Llave de Latón gira con un chasquido suave. La portezuela se abre y encuentro un Frasco de Cristal Vacío junto a la Nota del Guardián.'
+                      }
+                    ]);
+                  } else {
+                    showDialogue([
+                      { speaker: 'Doña Bruma', text: 'La portezuela ya está abierta.' }
+                    ]);
+                  }
+                } else {
+                  showDialogue([
+                    {
+                      speaker: 'Doña Bruma',
+                      text: `Eso no abrirá el cerrojo de latón del tocón.`
+                    }
+                  ]);
+                }
+              }
+            },
+            {
+              id: 'exit_to_sendero',
+              name: 'Sendero hacia el Este',
+              isExit: true,
+              box: { x: 830, y: 315, w: 110, h: 170 },
+              walkTo: { x: 855, y: 425 },
+              onInteract() {
+                changeRoom('sendero', { x: 145, y: 430, facing: 1 });
+              },
+              onUseItem() {
+                changeRoom('sendero', { x: 145, y: 430, facing: 1 });
+              }
+            }
+          ]
+        },
+
+        sendero: {
+          id: 'sendero',
+          name: 'El Sendero de las Luciérnagas',
+          walkBounds: { minX: 95, maxX: 875, minY: 350, maxY: 495 },
+          obstacles: [
+            { x: 245, y: 410, w: 185, h: 75 } // Estanque del claro
+          ],
+          interactables: [
+            {
+              id: 'exit_to_claro',
+              name: 'Regresar al Claro (Oeste)',
+              isExit: true,
+              box: { x: 25, y: 320, w: 100, h: 165 },
+              walkTo: { x: 115, y: 430 },
+              onInteract() {
+                changeRoom('claro', { x: 825, y: 425, facing: -1 });
+              },
+              onUseItem() {
+                changeRoom('claro', { x: 825, y: 425, facing: -1 });
+              }
+            },
+            {
+              id: 'firefly_swarm',
+              name: 'Enjambre de Luciérnagas',
+              box: { x: 250, y: 275, w: 165, h: 125 },
+              walkTo: { x: 230, y: 415 },
+              onInteract() {
+                if (!gameState.pickedUp.fireflies) {
+                  SoundEngine.playClick();
+                  showDialogue([
+                    {
+                      speaker: 'Doña Bruma',
+                      text: 'Danzan sobre el estanque como pequeñas chispas doradas. Si intento atraparlas con mis patas, se escaparán sin remedio.'
+                    }
+                  ]);
+                } else {
+                  showDialogue([
+                    {
+                      speaker: 'Doña Bruma',
+                      text: 'Aún quedan unas cuantas luciérnagas revoloteando en lo alto, iluminando los juncos.'
+                    }
+                  ]);
+                }
+              },
+              onUseItem(itemId) {
+                if (itemId === 'empty_jar') {
+                  consumeItem('empty_jar');
+                  addItemToInventory('firefly_jar');
+                  gameState.pickedUp.fireflies = true;
+                  SoundEngine.playPickup();
+                  showDialogue([
+                    {
+                      speaker: 'Doña Bruma',
+                      text: 'Con mucho cuidado, guío varias luciérnagas al interior del frasco. Ahora tengo un Frasco con Luciérnagas, aunque necesito un tapón especial para que no huyan ni se apague su brillo.'
+                    }
+                  ]);
+                } else {
+                  showDialogue([
+                    {
+                      speaker: 'Doña Bruma',
+                      text: 'Las luciérnagas se apartan con curiosidad; necesito un recipiente de cristal para recogerlas.'
+                    }
+                  ]);
+                }
+              }
+            },
+            {
+              id: 'bridge_pedestal',
+              name: gameState.flags.bridgeUnlocked ? 'Puente Rúnico al Santuario' : 'Pedestal del Puente Rúnico',
+              isExit: true,
+              box: { x: 455, y: 215, w: 155, h: 145 },
+              walkTo: { x: 525, y: 365 },
+              onInteract() {
+                if (gameState.flags.bridgeUnlocked) {
+                  changeRoom('santuario', { x: 185, y: 445, facing: 1 });
+                } else {
+                  SoundEngine.playClick();
+                  showDialogue([
+                    {
+                      speaker: 'Doña Bruma',
+                      text: 'Unas zarzas luminosas bloquean el puente de piedra. Junto al arco hay un pedestal hueco tallado para sostener una fuente de luz cálida.'
+                    }
+                  ]);
+                }
+              },
+              onUseItem(itemId) {
+                if (gameState.flags.bridgeUnlocked) {
+                  changeRoom('santuario', { x: 185, y: 445, facing: 1 });
+                  return;
+                }
+                if (itemId === 'amber_lantern') {
+                  gameState.flags.bridgeUnlocked = true;
+                  consumeItem('amber_lantern');
+                  SoundEngine.playPuzzleSolved();
+                  showDialogue([
+                    {
+                      speaker: 'Doña Bruma',
+                      text: 'Coloco la Linterna de Ámbar Viva sobre el pedestal. Su resplandor dorado acaricia las runas y las zarzas se retiran suavemente, despejando el puente hacia el Santuario.'
+                    }
+                  ]);
+                } else if (itemId === 'firefly_jar') {
+                  showDialogue([
+                    {
+                      speaker: 'Doña Bruma',
+                      text: 'La luz del frasco sin tapón es demasiado débil y dispersa para activar el pedestal.'
+                    }
+                  ]);
+                } else {
+                  showDialogue([
+                    {
+                      speaker: 'Doña Bruma',
+                      text: 'El pedestal espera una luz firme y cálida que despierte las runas del puente.'
+                    }
+                  ]);
+                }
+              }
+            },
+            {
+              id: 'exit_to_gruta',
+              name: 'Entrada a la Gruta del Herbolario (Este)',
+              isExit: true,
+              box: { x: 805, y: 295, w: 125, h: 185 },
+              walkTo: { x: 845, y: 425 },
+              onInteract() {
+                changeRoom('gruta', { x: 155, y: 435, facing: 1 });
+              },
+              onUseItem() {
+                changeRoom('gruta', { x: 155, y: 435, facing: 1 });
+              }
+            }
+          ]
+        },
+
+        gruta: {
+          id: 'gruta',
+          name: 'La Gruta del Herbolario',
+          walkBounds: { minX: 110, maxX: 845, minY: 375, maxY: 495 },
+          obstacles: [
+            { x: 350, y: 365, w: 195, h: 55 } // Mesa del herbolario
+          ],
+          interactables: [
+            {
+              id: 'exit_gruta_to_sendero',
+              name: 'Salir al Sendero (Oeste)',
+              isExit: true,
+              box: { x: 30, y: 310, w: 105, h: 180 },
+              walkTo: { x: 125, y: 435 },
+              onInteract() {
+                changeRoom('sendero', { x: 810, y: 425, facing: -1 });
+              },
+              onUseItem() {
+                changeRoom('sendero', { x: 810, y: 425, facing: -1 });
+              }
+            },
+            {
+              id: 'herbalist_table',
+              name: 'Mesa de Alquimia',
+              box: { x: 355, y: 290, w: 185, h: 105 },
+              walkTo: { x: 445, y: 432 },
+              onInteract() {
+                if (!gameState.pickedUp.amber_cork) {
+                  addItemToInventory('amber_cork');
+                  gameState.pickedUp.amber_cork = true;
+                  SoundEngine.playPickup();
+                  showDialogue([
+                    {
+                      speaker: 'Doña Bruma',
+                      text: 'Entre frascos polvorientos y hierbas secas encuentro un Corcho de Ámbar tallado. Parece encajar en un frasco de cristal.'
+                    }
+                  ]);
+                } else {
+                  showDialogue([
+                    {
+                      speaker: 'Doña Bruma',
+                      text: 'La vieja mesa conserva manchas de tinturas antiguas y el aroma dulce de la resina.'
+                    }
+                  ]);
+                }
+              },
+              onUseItem() {
+                showDialogue([
+                  {
+                    speaker: 'Doña Bruma',
+                    text: 'No hace falta dejar esto sobre la mesa.'
+                  }
+                ]);
+              }
+            },
+            {
+              id: 'stone_mortar',
+              name: 'Mortero de Piedra',
+              box: { x: 580, y: 325, w: 85, h: 85 },
+              walkTo: { x: 615, y: 425 },
+              onInteract() {
+                if (!gameState.pickedUp.spore_powder) {
+                  SoundEngine.playClick();
+                  showDialogue([
+                    {
+                      speaker: 'Doña Bruma',
+                      text: 'Un mortero de piedra pulida con mano de granito. Sirve para moler ingredientes delicados del bosque.'
+                    }
+                  ]);
+                } else {
+                  showDialogue([
+                    {
+                      speaker: 'Doña Bruma',
+                      text: 'Aún quedan motas doradas brillando en el fondo del mortero.'
+                    }
+                  ]);
+                }
+              },
+              onUseItem(itemId) {
+                if (itemId === 'glow_mushroom') {
+                  consumeItem('glow_mushroom');
+                  addItemToInventory('spore_powder');
+                  gameState.pickedUp.spore_powder = true;
+                  SoundEngine.playPuzzleSolved();
+                  showDialogue([
+                    {
+                      speaker: 'Doña Bruma',
+                      text: 'Muelo suavemente la Seta Luminosa en el mortero hasta obtener un fino Polvo de Espora Dorada que chispea como brasas vivas.'
+                    }
+                  ]);
+                } else {
+                  showDialogue([
+                    {
+                      speaker: 'Doña Bruma',
+                      text: 'No sería buena idea triturar eso en el mortero.'
+                    }
+                  ]);
+                }
+              }
+            },
+            {
+              id: 'cave_mushroom',
+              name: 'Seta Luminosa del Rincón',
+              box: { x: 725, y: 345, w: 95, h: 95 },
+              walkTo: { x: 745, y: 440 },
+              onInteract() {
+                if (!gameState.pickedUp.glow_mushroom) {
+                  addItemToInventory('glow_mushroom');
+                  gameState.pickedUp.glow_mushroom = true;
+                  SoundEngine.playPickup();
+                  showDialogue([
+                    {
+                      speaker: 'Doña Bruma',
+                      text: 'Recojo con delicadeza esta Seta Luminosa. Sus branquias están repletas de esporas doradas.'
+                    }
+                  ]);
+                } else {
+                  showDialogue([
+                    {
+                      speaker: 'Doña Bruma',
+                      text: 'El musgo húmedo de la gruta sigue nutriendo pequeñas raíces.'
+                    }
+                  ]);
+                }
+              },
+              onUseItem() {
+                showDialogue([
+                  { speaker: 'Doña Bruma', text: 'La seta no necesita nada; solo basta con recogerla.' }
+                ]);
+              }
+            },
+            {
+              id: 'herbalist_diary',
+              name: 'Cuaderno del Herbolario',
+              box: { x: 215, y: 310, w: 85, h: 80 },
+              walkTo: { x: 255, y: 415 },
+              onInteract() {
+                SoundEngine.playClick();
+                showDialogue([
+                  {
+                    speaker: 'Notas del Herbolario',
+                    text: '"El Faro de Musgo requiere dos dones para despertar: primero su Cristal Corazón en el centro de la linterna, y después el Polvo de Espora Dorada para encender su llama."'
+                  }
+                ]);
+              },
+              onUseItem() {
+                showDialogue([
+                  { speaker: 'Doña Bruma', text: 'Es un cuaderno antiguo; mejor no manchar sus páginas.' }
+                ]);
+              }
+            }
+          ]
+        },
+
+        santuario: {
+          id: 'santuario',
+          name: 'El Santuario del Faro de Musgo',
+          walkBounds: { minX: 115, maxX: 855, minY: 375, maxY: 495 },
+          obstacles: [
+            { x: 545, y: 355, w: 165, h: 65 } // Base del Faro
+          ],
+          interactables: [
+            {
+              id: 'exit_santuario_to_sendero',
+              name: 'Volver al Puente (Sur-Oeste)',
+              isExit: true,
+              box: { x: 40, y: 345, w: 110, h: 145 },
+              walkTo: { x: 135, y: 445 },
+              onInteract() {
+                changeRoom('sendero', { x: 525, y: 380, facing: 1 });
+              },
+              onUseItem() {
+                changeRoom('sendero', { x: 525, y: 380, facing: 1 });
+              }
+            },
+            {
+              id: 'stone_reliquary',
+              name: 'Relicario Sellado',
+              box: { x: 295, y: 300, w: 105, h: 115 },
+              walkTo: { x: 345, y: 425 },
+              onInteract() {
+                if (!gameState.flags.reliquaryUnlocked) {
+                  SoundEngine.playClick();
+                  openCodePuzzleModal();
+                } else {
+                  showDialogue([
+                    {
+                      speaker: 'Doña Bruma',
+                      text: 'El relicario de bronce permanece abierto. En su interior descansaba el Cristal Corazón del Bosque.'
+                    }
+                  ]);
+                }
+              },
+              onUseItem() {
+                if (!gameState.flags.reliquaryUnlocked) {
+                  showDialogue([
+                    {
+                      speaker: 'Doña Bruma',
+                      text: 'Este relicario no usa llave; se abre alineando sus tres ruedas numéricas.'
+                    }
+                  ]);
+                } else {
+                  showDialogue([
+                    { speaker: 'Doña Bruma', text: 'El relicario ya está abierto.' }
+                  ]);
+                }
+              }
+            },
+            {
+              id: 'moss_beacon',
+              name: 'El Faro de Musgo',
+              box: { x: 540, y: 120, w: 175, h: 275 },
+              walkTo: { x: 505, y: 415 },
+              onInteract() {
+                if (gameState.flags.beaconLit) {
+                  showDialogue([
+                    {
+                      speaker: 'Doña Bruma',
+                      text: 'El Faro de Musgo brilla con plenitud, guiando todos los caminos del bosque.'
+                    }
+                  ]);
+                } else if (!gameState.flags.crystalPlaced) {
+                  SoundEngine.playClick();
+                  showDialogue([
+                    {
+                      speaker: 'Doña Bruma',
+                      text: 'La linterna de hierro y cristal del faro está apagada. En su centro hay un engaste vacío esperando el Cristal Corazón del Bosque.'
+                    }
+                  ]);
+                } else {
+                  SoundEngine.playClick();
+                  showDialogue([
+                    {
+                      speaker: 'Doña Bruma',
+                      text: 'El Cristal Corazón ya descansa en el interior del faro, pero aún duerme. Necesita una chispa de Polvo de Espora Dorada para encenderse.'
+                    }
+                  ]);
+                }
+              },
+              onUseItem(itemId) {
+                if (itemId === 'heart_crystal') {
+                  gameState.flags.crystalPlaced = true;
+                  consumeItem('heart_crystal');
+                  SoundEngine.playPuzzleSolved();
+                  showDialogue([
+                    {
+                      speaker: 'Doña Bruma',
+                      text: 'Coloco el Cristal Corazón en el engaste central del faro. La gema emite un pulso azulado suave... Ahora solo falta encenderlo con Polvo de Espora Dorada.'
+                    }
+                  ]);
+                } else if (itemId === 'spore_powder') {
+                  if (!gameState.flags.crystalPlaced) {
+                    showDialogue([
+                      {
+                        speaker: 'Doña Bruma',
+                        text: 'Si esparzo el polvo ahora se perderá en el viento; primero debo colocar el Cristal Corazón en el engaste del faro.'
+                      }
+                    ]);
+                  } else {
+                    gameState.flags.beaconLit = true;
+                    consumeItem('spore_powder');
+                    SoundEngine.playPuzzleSolved();
+                    hasUnsavedChanges = true;
+                    showDialogue(
+                      [
+                        {
+                          speaker: 'Doña Bruma',
+                          text: 'Esparzo el Polvo de Espora Dorada sobre el Cristal Corazón. Al instante, una luz cálida y dorada despierta como un pequeño sol en medio de la noche.'
+                        },
+                        {
+                          speaker: 'Doña Bruma',
+                          text: 'La niebla retrocede entre los árboles antiguos. Mi viaje por este bosque ha cumplido su propósito.'
+                        }
+                      ],
+                      () => {
+                        triggerGameEnding();
+                      }
+                    );
+                  }
+                } else {
+                  showDialogue([
+                    {
+                      speaker: 'Doña Bruma',
+                      text: 'Eso no servirá para encender el antiguo Faro de Musgo.'
+                    }
+                  ]);
+                }
+              }
+            }
+          ]
+        }
+      };
+
+      /* -------------------------------------------------------------------
+         SECCIÓN E: RENDERIZADO ARTÍSTICO EN CANVAS (960 x 540)
+         ------------------------------------------------------------------- */
+      const canvas = document.getElementById('game-canvas');
+      const ctx = canvas.getContext('2d');
+
+      // Partículas mágicas ambientales (esporas y luciérnagas de fondo)
+      const ambientParticles = Array.from({ length: 42 }, (_, i) => ({
+        x: (i * 97) % 960,
+        y: (i * 53) % 500,
+        r: 1.2 + (i % 3) * 0.8,
+        speedX: ((i % 5) - 2) * 5,
+        speedY: -4 - (i % 4) * 3,
+        phase: i * 0.7,
+        warm: i % 3 !== 0
+      }));
+
+      let lastFrameTime = performance.now();
+      let globalTime = 0;
+
+      function renderLoop(now) {
+        const dt = Math.min(0.05, (now - lastFrameTime) / 1000);
+        lastFrameTime = now;
+
+        if (!isPaused && !document.getElementById('game-view').classList.contains('hidden')) {
+          globalTime += dt;
+          updateMovement(dt);
+          updateParticles(dt);
+          drawScene();
+        }
+
+        requestAnimationFrame(renderLoop);
+      }
+
+      function updateParticles(dt) {
+        for (const p of ambientParticles) {
+          p.x += (p.speedX + Math.sin(globalTime + p.phase) * 8) * dt;
+          p.y += p.speedY * dt;
+          if (p.y < 20) {
+            p.y = 510;
+            p.x = Math.random() * 960;
+          }
+          if (p.x < 0) p.x += 960;
+          if (p.x > 960) p.x -= 960;
+        }
+      }
+
+      function drawScene() {
+        ctx.clearRect(0, 0, 960, 540);
+        const room = ROOMS[gameState.currentRoom];
+
+        if (room.id === 'claro') drawRoomClaro();
+        else if (room.id === 'sendero') drawRoomSendero();
+        else if (room.id === 'gruta') drawRoomGruta();
+        else if (room.id === 'santuario') drawRoomSantuario();
+
+        // Dibujar indicadores sutiles de salidas conectadas
+        drawExitMarkers(room);
+
+        // Dibujar a Doña Bruma (la protagonista)
+        drawDonaBruma(gameState.player.x, gameState.player.y, gameState.player.facing, movement.active ? movement.walkCycle : 0);
+
+        // Capa atmosférica frontal (partículas luminosas y viñeta de cuento)
+        drawAtmosphereOverlay(room.id === 'santuario' && gameState.flags.beaconLit);
+      }
+
+      function drawSkyAndTreesBackdrop(topColor, midColor, treeSilhouetteColor, showMoon = false) {
+        const skyGrad = ctx.createLinearGradient(0, 0, 0, 400);
+        skyGrad.addColorStop(0, topColor);
+        skyGrad.addColorStop(1, midColor);
+        ctx.fillStyle = skyGrad;
+        ctx.fillRect(0, 0, 960, 540);
+
+        // Estrellas suaves
+        ctx.fillStyle = 'rgba(243, 230, 200, 0.55)';
+        for (let i = 0; i < 36; i++) {
+          const sx = (i * 173 + 40) % 940;
+          const sy = (i * 67 + 20) % 210;
+          const tw = 0.6 + 0.4 * Math.sin(globalTime * 2 + i);
+          ctx.globalAlpha = tw * 0.75;
+          ctx.fillRect(sx, sy, 2, 2);
+        }
+        ctx.globalAlpha = 1;
+
+        if (showMoon) {
+          const moonGlow = ctx.createRadialGradient(760, 95, 10, 760, 95, 110);
+          moonGlow.addColorStop(0, 'rgba(243, 232, 198, 0.45)');
+          moonGlow.addColorStop(1, 'rgba(243, 232, 198, 0)');
+          ctx.fillStyle = moonGlow;
+          ctx.beginPath();
+          ctx.arc(760, 95, 110, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#f5ebd1';
+          ctx.beginPath();
+          ctx.arc(760, 95, 30, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Troncos lejanos entre niebla
+        ctx.fillStyle = treeSilhouetteColor;
+        const bgTrees = [45, 155, 290, 430, 610, 745, 880];
+        bgTrees.forEach((tx, idx) => {
+          const w = 34 + (idx % 3) * 14;
+          ctx.fillRect(tx, 0, w, 390);
+        });
+
+        // Franja de bruma mágica en el horizonte
+        const mistGrad = ctx.createLinearGradient(0, 230, 0, 395);
+        mistGrad.addColorStop(0, 'rgba(130, 155, 175, 0)');
+        mistGrad.addColorStop(0.6, 'rgba(130, 155, 175, 0.14)');
+        mistGrad.addColorStop(1, 'rgba(25, 38, 34, 0.65)');
+        ctx.fillStyle = mistGrad;
+        ctx.fillRect(0, 230, 960, 165);
+      }
+
+      function drawForestFloor(baseDark, baseLight, pathColor) {
+        const floorGrad = ctx.createLinearGradient(0, 345, 0, 540);
+        floorGrad.addColorStop(0, baseDark);
+        floorGrad.addColorStop(1, baseLight);
+        ctx.fillStyle = floorGrad;
+        ctx.fillRect(0, 345, 960, 195);
+
+        // Sendero transitable sugerido visualmente
+        ctx.fillStyle = pathColor;
+        ctx.beginPath();
+        ctx.ellipse(490, 432, 410, 66, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Piedras planas y briznas de hierba
+        ctx.fillStyle = 'rgba(18, 24, 22, 0.45)';
+        const stones = [
+          [210, 445, 24, 9], [340, 465, 30, 10], [490, 440, 28, 9],
+          [645, 458, 26, 9], [770, 435, 32, 11]
+        ];
+        for (const [sx, sy, rw, rh] of stones) {
+          ctx.beginPath();
+          ctx.ellipse(sx, sy, rw, rh, 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      function drawMushroomCluster(x, y, scale = 1, capColor = '#7e2e46', dotColor = '#f3d79b') {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.scale(scale, scale);
+        // Tallo
+        ctx.fillStyle = '#d8cbb8';
+        ctx.fillRect(-4, -14, 8, 14);
+        // Sombrero
+        ctx.fillStyle = capColor;
+        ctx.beginPath();
+        ctx.arc(0, -14, 14, Math.PI, 0);
+        ctx.closePath();
+        ctx.fill();
+        // Motas
+        ctx.fillStyle = dotColor;
+        ctx.beginPath();
+        ctx.arc(-5, -19, 2, 0, Math.PI * 2);
+        ctx.arc(4, -21, 1.8, 0, Math.PI * 2);
+        ctx.arc(1, -16, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      /* --- HABITACIÓN 1: EL CLARO DEL TOCÓN ANTIGUO --- */
+      function drawRoomClaro() {
+        drawSkyAndTreesBackdrop('#0d1322', '#1b2b38', 'rgba(16, 24, 34, 0.72)', true);
+        drawForestFloor('#182b22', '#101d17', 'rgba(54, 43, 33, 0.55)');
+
+        // Rayo de luz de luna diagonal
+        ctx.save();
+        const beam = ctx.createLinearGradient(680, 0, 320, 480);
+        beam.addColorStop(0, 'rgba(225, 232, 248, 0.12)');
+        beam.addColorStop(1, 'rgba(225, 232, 248, 0)');
+        ctx.fillStyle = beam;
+        ctx.beginPath();
+        ctx.moveTo(620, 0);
+        ctx.lineTo(820, 0);
+        ctx.lineTo(480, 500);
+        ctx.lineTo(220, 500);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+
+        // Gran Tocón Antiguo (izquierda)
+        ctx.fillStyle = '#362419';
+        ctx.beginPath();
+        ctx.moveTo(95, 405);
+        ctx.lineTo(125, 240);
+        ctx.lineTo(265, 245);
+        ctx.lineTo(295, 405);
+        ctx.closePath();
+        ctx.fill();
+
+        // Corteza y musgo sobre el tocón
+        ctx.strokeStyle = '#22150e';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.fillStyle = '#335942';
+        ctx.beginPath();
+        ctx.ellipse(195, 243, 72, 16, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Portezuela del tocón (cambia de estado si se desbloquea)
+        if (!gameState.flags.stumpUnlocked) {
+          ctx.fillStyle = '#523624';
+          ctx.beginPath();
+          ctx.roundRect(160, 305, 66, 86, [30, 30, 4, 4]);
+          ctx.fill();
+          ctx.strokeStyle = '#d4af6a';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          // Cerradura de latón
+          ctx.fillStyle = '#f3d79b';
+          ctx.beginPath();
+          ctx.arc(212, 352, 5, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          // Interior hueco iluminado cálidamente
+          ctx.fillStyle = '#120b07';
+          ctx.beginPath();
+          ctx.roundRect(160, 305, 66, 86, [30, 30, 4, 4]);
+          ctx.fill();
+          // Puerta abierta hacia un lado
+          ctx.fillStyle = '#472e1e';
+          ctx.fillRect(132, 310, 28, 80);
+        }
+
+        // Poste indicador tallado
+        ctx.fillStyle = '#473123';
+        ctx.fillRect(554, 305, 14, 98);
+        ctx.fillStyle = '#634632';
+        ctx.beginPath();
+        ctx.moveTo(522, 312);
+        ctx.lineTo(596, 312);
+        ctx.lineTo(610, 326);
+        ctx.lineTo(596, 340);
+        ctx.lineTo(522, 340);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = '#9c7c54';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Raíz Musgosa en primer plano
+        ctx.fillStyle = '#3a271c';
+        ctx.beginPath();
+        ctx.moveTo(315, 475);
+        ctx.quadraticCurveTo(375, 420, 445, 472);
+        ctx.quadraticCurveTo(380, 488, 315, 475);
+        ctx.fill();
+        ctx.fillStyle = '#3b664b';
+        ctx.beginPath();
+        ctx.ellipse(378, 452, 42, 11, -0.1, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Destello sutil de la llave antes de recogerla
+        if (!gameState.pickedUp.brass_key) {
+          const glint = 0.4 + 0.6 * Math.abs(Math.sin(globalTime * 3));
+          ctx.fillStyle = `rgba(243, 215, 155, ${glint})`;
+          ctx.beginPath();
+          ctx.arc(386, 456, 4.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Decoración de hongos
+        drawMushroomCluster(280, 405, 0.9, '#7e2e46');
+        drawMushroomCluster(665, 392, 1.1, '#4a6b8c');
+        drawMushroomCluster(685, 396, 0.75, '#7e2e46');
+      }
+
+      /* --- HABITACIÓN 2: EL SENDERO DE LAS LUCIÉRNAGAS --- */
+      function drawRoomSendero() {
+        drawSkyAndTreesBackdrop('#0c1220', '#192a36', 'rgba(14, 22, 30, 0.78)', false);
+        drawForestFloor('#162920', '#0e1b15', 'rgba(52, 42, 33, 0.52)');
+
+        // Puente de piedra hacia el norte (centro-fondo)
+        ctx.fillStyle = '#3b424d';
+        ctx.beginPath();
+        ctx.moveTo(475, 355);
+        ctx.lineTo(492, 235);
+        ctx.lineTo(572, 235);
+        ctx.lineTo(590, 355);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = '#232830';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Pedestal del Puente Rúnico
+        ctx.fillStyle = '#4c5461';
+        ctx.fillRect(442, 295, 28, 62);
+        ctx.fillStyle = '#687385';
+        ctx.fillRect(436, 288, 40, 10);
+
+        if (!gameState.flags.bridgeUnlocked) {
+          // Zarzas mágicas bloqueando el puente
+          ctx.strokeStyle = '#38664e';
+          ctx.lineWidth = 5;
+          ctx.beginPath();
+          ctx.moveTo(478, 325);
+          ctx.quadraticCurveTo(532, 275, 586, 320);
+          ctx.moveTo(482, 275);
+          ctx.quadraticCurveTo(532, 315, 582, 268);
+          ctx.stroke();
+        } else {
+          // Linterna de Ámbar Viva colocada y brillando en el pedestal
+          const halo = ctx.createRadialGradient(456, 280, 4, 456, 280, 95);
+          halo.addColorStop(0, 'rgba(255, 222, 130, 0.75)');
+          halo.addColorStop(1, 'rgba(255, 222, 130, 0)');
+          ctx.fillStyle = halo;
+          ctx.beginPath();
+          ctx.arc(456, 280, 95, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#ffe599';
+          ctx.fillRect(449, 272, 14, 16);
+        }
+
+        // Pequeño estanque reflejante (izquierda-centro)
+        const pondGrad = ctx.createRadialGradient(335, 445, 15, 335, 445, 92);
+        pondGrad.addColorStop(0, '#27495c');
+        pondGrad.addColorStop(1, '#132631');
+        ctx.fillStyle = pondGrad;
+        ctx.beginPath();
+        ctx.ellipse(335, 445, 88, 34, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#355947';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // Enjambre de luciérnagas danzando sobre el estanque
+        const count = gameState.pickedUp.fireflies ? 3 : 11;
+        for (let i = 0; i < count; i++) {
+          const angle = globalTime * (1.3 + (i % 3) * 0.4) + i * 1.1;
+          const fx = 330 + Math.cos(angle) * (42 + (i % 4) * 10);
+          const fy = 335 + Math.sin(angle * 1.4) * (24 + (i % 3) * 7) - (gameState.pickedUp.fireflies ? 35 : 0);
+
+          const glow = ctx.createRadialGradient(fx, fy, 1, fx, fy, 14);
+          glow.addColorStop(0, 'rgba(255, 238, 136, 0.95)');
+          glow.addColorStop(1, 'rgba(255, 238, 136, 0)');
+          ctx.fillStyle = glow;
+          ctx.beginPath();
+          ctx.arc(fx, fy, 14, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#fffbe0';
+          ctx.fillRect(fx - 1.5, fy - 1.5, 3, 3);
+        }
+
+        // Arco de raíces hacia la Gruta del Herbolario (derecha)
+        ctx.fillStyle = '#2b1c14';
+        ctx.beginPath();
+        ctx.moveTo(790, 480);
+        ctx.quadraticCurveTo(800, 265, 955, 280);
+        ctx.lineTo(955, 480);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#090c12';
+        ctx.beginPath();
+        ctx.ellipse(875, 395, 52, 78, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        drawMushroomCluster(785, 465, 1.05, '#4b789c');
+        drawMushroomCluster(195, 405, 0.85, '#7e2e46');
+      }
+
+      /* --- HABITACIÓN 3: LA GRUTA DEL HERBOLARIO --- */
+      function drawRoomGruta() {
+        // Interior acogedor de caverna con raíces
+        const caveGrad = ctx.createRadialGradient(480, 250, 60, 480, 270, 560);
+        caveGrad.addColorStop(0, '#241f2d');
+        caveGrad.addColorStop(1, '#0d0f16');
+        ctx.fillStyle = caveGrad;
+        ctx.fillRect(0, 0, 960, 540);
+
+        // Suelo de piedra y tierra apisonada
+        drawForestFloor('#231d21', '#151216', 'rgba(66, 54, 46, 0.45)');
+
+        // Raíces colgantes y cristales tenues en el techo
+        ctx.strokeStyle = '#332219';
+        ctx.lineWidth = 14;
+        ctx.beginPath();
+        ctx.moveTo(140, 0);
+        ctx.quadraticCurveTo(180, 140, 90, 340);
+        ctx.moveTo(820, 0);
+        ctx.quadraticCurveTo(790, 150, 880, 380);
+        ctx.stroke();
+
+        // Pequeños cristales amatista iluminando suavemente
+        const crystals = [[280, 65], [510, 48], [695, 78]];
+        for (const [cx, cy] of crystals) {
+          const cg = ctx.createRadialGradient(cx, cy, 2, cx, cy, 55);
+          cg.addColorStop(0, 'rgba(168, 130, 221, 0.35)');
+          cg.addColorStop(1, 'rgba(168, 130, 221, 0)');
+          ctx.fillStyle = cg;
+          ctx.beginPath();
+          ctx.arc(cx, cy, 55, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#b492e8';
+          ctx.beginPath();
+          ctx.moveTo(cx - 6, cy - 15);
+          ctx.lineTo(cx + 6, cy - 15);
+          ctx.lineTo(cx, cy + 16);
+          ctx.closePath();
+          ctx.fill();
+        }
+
+        // Estante izquierdo con el Cuaderno del Herbolario
+        ctx.fillStyle = '#473022';
+        ctx.fillRect(210, 345, 95, 12);
+        ctx.fillRect(220, 357, 10, 42);
+        ctx.fillRect(285, 357, 10, 42);
+        // Cuaderno abierto
+        ctx.fillStyle = '#dfd0b8';
+        ctx.fillRect(232, 326, 48, 19);
+        ctx.strokeStyle = '#7c653b';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(232, 326, 48, 19);
+
+        // Mesa central de Alquimia
+        ctx.fillStyle = '#4f3525';
+        ctx.fillRect(355, 338, 185, 16);
+        ctx.fillRect(372, 354, 14, 54);
+        ctx.fillRect(508, 354, 14, 54);
+
+        // Frascos decorativos en la mesa
+        ctx.fillStyle = 'rgba(116, 177, 142, 0.55)';
+        ctx.fillRect(380, 314, 16, 24);
+        ctx.fillStyle = 'rgba(155, 120, 196, 0.55)';
+        ctx.fillRect(404, 318, 14, 20);
+
+        // Corcho de Ámbar sobre la mesa (si aún no se recoge)
+        if (!gameState.pickedUp.amber_cork) {
+          const glow = ctx.createRadialGradient(475, 326, 2, 475, 326, 28);
+          glow.addColorStop(0, 'rgba(243, 168, 71, 0.7)');
+          glow.addColorStop(1, 'rgba(243, 168, 71, 0)');
+          ctx.fillStyle = glow;
+          ctx.beginPath();
+          ctx.arc(475, 326, 28, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#e69138';
+          ctx.beginPath();
+          ctx.moveTo(467, 320);
+          ctx.lineTo(483, 320);
+          ctx.lineTo(481, 337);
+          ctx.lineTo(469, 337);
+          ctx.closePath();
+          ctx.fill();
+        }
+
+        // Tocón con el Mortero de Piedra (derecha-centro)
+        ctx.fillStyle = '#3b281d';
+        ctx.fillRect(595, 368, 54, 42);
+        ctx.fillStyle = '#6c7582';
+        ctx.beginPath();
+        ctx.arc(622, 354, 22, 0, Math.PI);
+        ctx.fill();
+        // Mano del mortero
+        ctx.strokeStyle = '#8b95a3';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.moveTo(622, 356);
+        ctx.lineTo(638, 332);
+        ctx.stroke();
+
+        if (gameState.pickedUp.spore_powder) {
+          ctx.fillStyle = '#f3c65f';
+          ctx.beginPath();
+          ctx.ellipse(622, 353, 14, 4, 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Seta Luminosa del rincón derecho (si aún no se recoge)
+        if (!gameState.pickedUp.glow_mushroom) {
+          const mg = ctx.createRadialGradient(768, 392, 4, 768, 392, 42);
+          mg.addColorStop(0, 'rgba(130, 216, 255, 0.5)');
+          mg.addColorStop(1, 'rgba(130, 216, 255, 0)');
+          ctx.fillStyle = mg;
+          ctx.beginPath();
+          ctx.arc(768, 392, 42, 0, Math.PI * 2);
+          ctx.fill();
+          drawMushroomCluster(768, 412, 1.5, '#48759e', '#ffe699');
+        }
+      }
+
+      /* --- HABITACIÓN 4: EL SANTUARIO DEL FARO DE MUSGO --- */
+      function drawRoomSantuario() {
+        drawSkyAndTreesBackdrop('#090e1c', '#1c243b', 'rgba(13, 18, 32, 0.6)', true);
+        drawForestFloor('#1b2e26', '#101d18', 'rgba(65, 68, 74, 0.5)');
+
+        // Relicario Sellado (izquierda del faro)
+        ctx.fillStyle = '#474f5c';
+        ctx.fillRect(310, 325, 74, 88);
+        ctx.strokeStyle = '#d4af6a';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(314, 329, 66, 80);
+
+        if (!gameState.flags.reliquaryUnlocked) {
+          // Tres ruedas de bronce cerradas
+          for (let i = 0; i < 3; i++) {
+            ctx.fillStyle = '#b5894c';
+            ctx.beginPath();
+            ctx.arc(331 + i * 16, 368, 6, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        } else {
+          // Relicario abierto
+          ctx.fillStyle = '#12161f';
+          ctx.fillRect(322, 338, 50, 62);
+        }
+
+        // Torre del Faro de Musgo (derecha-centro)
+        ctx.fillStyle = '#4a525e';
+        ctx.beginPath();
+        ctx.moveTo(570, 412);
+        ctx.lineTo(592, 210);
+        ctx.lineTo(664, 210);
+        ctx.lineTo(686, 412);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = '#252a32';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+
+        // Enredaderas de musgo subiendo por la torre
+        ctx.strokeStyle = '#386349';
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.moveTo(582, 405);
+        ctx.quadraticCurveTo(645, 340, 595, 270);
+        ctx.quadraticCurveTo(650, 235, 628, 212);
+        ctx.stroke();
+
+        // Cámara de la linterna del Faro
+        ctx.fillStyle = '#2b313b';
+        ctx.fillRect(584, 150, 88, 60);
+
+        // Cristal interior según estado
+        if (gameState.flags.beaconLit) {
+          // Faro completamente encendido
+          const lightPulse = 180 + Math.sin(globalTime * 3) * 18;
+          const beaconGlow = ctx.createRadialGradient(628, 180, 10, 628, 180, lightPulse);
+          beaconGlow.addColorStop(0, 'rgba(255, 244, 184, 0.98)');
+          beaconGlow.addColorStop(0.45, 'rgba(243, 198, 95, 0.45)');
+          beaconGlow.addColorStop(1, 'rgba(243, 198, 95, 0)');
+          ctx.fillStyle = beaconGlow;
+          ctx.beginPath();
+          ctx.arc(628, 180, lightPulse, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Haces de luz girando suavemente
+          ctx.save();
+          ctx.translate(628, 180);
+          ctx.rotate(Math.sin(globalTime * 0.7) * 0.25);
+          const rayGrad = ctx.createLinearGradient(0, 0, -480, 120);
+          rayGrad.addColorStop(0, 'rgba(255, 238, 160, 0.35)');
+          rayGrad.addColorStop(1, 'rgba(255, 238, 160, 0)');
+          ctx.fillStyle = rayGrad;
+          ctx.beginPath();
+          ctx.moveTo(0, -16);
+          ctx.lineTo(-520, -90);
+          ctx.lineTo(-520, 170);
+          ctx.lineTo(0, 16);
+          ctx.closePath();
+          ctx.fill();
+          ctx.restore();
+
+          ctx.fillStyle = '#fffbe0';
+          ctx.fillRect(596, 158, 64, 44);
+        } else if (gameState.flags.crystalPlaced) {
+          // Cristal colocado esperando chispa de espora
+          const softGlow = ctx.createRadialGradient(628, 180, 5, 628, 180, 55);
+          softGlow.addColorStop(0, 'rgba(128, 216, 255, 0.65)');
+          softGlow.addColorStop(1, 'rgba(128, 216, 255, 0)');
+          ctx.fillStyle = softGlow;
+          ctx.beginPath();
+          ctx.arc(628, 180, 55, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#80d8ff';
+          ctx.beginPath();
+          ctx.moveTo(628, 164);
+          ctx.lineTo(640, 180);
+          ctx.lineTo(628, 196);
+          ctx.lineTo(616, 180);
+          ctx.closePath();
+          ctx.fill();
+        } else {
+          // Linterna apagada
+          ctx.fillStyle = '#141922';
+          ctx.fillRect(596, 158, 64, 44);
+        }
+
+        // Tejado puntiagudo del Faro
+        ctx.fillStyle = '#344c3e';
+        ctx.beginPath();
+        ctx.moveTo(576, 150);
+        ctx.lineTo(628, 108);
+        ctx.lineTo(680, 150);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = '#d4af6a';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+
+      /* --- MARCADORES DISCRETOS DE SALIDAS --- */
+      function drawExitMarkers(room) {
+        for (const item of room.interactables) {
+          if (!item.isExit) continue;
+          if (item.id === 'bridge_pedestal' && !gameState.flags.bridgeUnlocked) continue;
+
+          const cx = item.box.x + item.box.w / 2;
+          const cy = item.box.y + item.box.h - 22;
+          const pulse = 0.55 + 0.45 * Math.sin(globalTime * 3.2);
+
+          ctx.save();
+          ctx.strokeStyle = `rgba(243, 215, 155, ${pulse * 0.85})`;
+          ctx.fillStyle = `rgba(21, 27, 38, 0.72)`;
+          ctx.lineWidth = 1.5;
+
+          ctx.beginPath();
+          ctx.arc(cx, cy, 13, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          // Pequeña flecha direccional
+          ctx.fillStyle = '#f3d79b';
+          ctx.beginPath();
+          if (item.id.includes('sendero') && room.id === 'claro') {
+            ctx.moveTo(cx - 3, cy - 5); ctx.lineTo(cx + 5, cy); ctx.lineTo(cx - 3, cy + 5);
+          } else if (item.id.includes('gruta')) {
+            ctx.moveTo(cx - 3, cy - 5); ctx.lineTo(cx + 5, cy); ctx.lineTo(cx - 3, cy + 5);
+          } else if (item.id === 'bridge_pedestal') {
+            ctx.moveTo(cx - 5, cy + 3); ctx.lineTo(cx, cy - 5); ctx.lineTo(cx + 5, cy + 3);
+          } else {
+            ctx.moveTo(cx + 3, cy - 5); ctx.lineTo(cx - 5, cy); ctx.lineTo(cx + 3, cy + 5);
+          }
+          ctx.closePath();
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      /* --- DIBUJO DETALLADO DE DOÑA BRUMA (PROTAGONISTA) --- */
+      function drawDonaBruma(x, y, facing, walkCycle) {
+        ctx.save();
+        ctx.translate(x, y);
+
+        // Sombra suave bajo sus patitas
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.42)';
+        ctx.beginPath();
+        ctx.ellipse(0, 2, 20, 6, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Voltear horizontalmente según dirección
+        ctx.scale(facing, 1);
+
+        const bob = walkCycle > 0 ? Math.abs(Math.sin(walkCycle * 9)) * 3.5 : Math.sin(globalTime * 2.2) * 1;
+        const legSwing = walkCycle > 0 ? Math.sin(walkCycle * 9) * 6 : 0;
+
+        // Cola larga articulada
+        ctx.strokeStyle = '#c99399';
+        ctx.lineWidth = 3;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(-10, -14 - bob * 0.4);
+        ctx.quadraticCurveTo(-28, -18 + Math.sin(globalTime * 3 + walkCycle * 6) * 5, -36, -28);
+        ctx.stroke();
+
+        // Patitas animadas
+        ctx.fillStyle = '#d69fa5';
+        ctx.beginPath();
+        ctx.ellipse(-5 - legSwing, -2, 5, 2.8, 0, 0, Math.PI * 2);
+        ctx.ellipse(6 + legSwing, -2, 5, 2.8, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Cuerpo y abrigo de viajera (verde bosque con borde ocre)
+        ctx.fillStyle = '#2d4739';
+        ctx.beginPath();
+        ctx.moveTo(-14, -8 - bob);
+        ctx.quadraticCurveTo(-15, -36 - bob, 0, -40 - bob);
+        ctx.quadraticCurveTo(15, -36 - bob, 14, -8 - bob);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = '#b5894c';
+        ctx.lineWidth = 1.4;
+        ctx.stroke();
+
+        // Bolsita de cuero cruzada al costado (elemento icónico)
+        ctx.strokeStyle = '#6e3f1d';
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        ctx.moveTo(-7, -36 - bob);
+        ctx.lineTo(5, -18 - bob);
+        ctx.stroke();
+
+        ctx.fillStyle = '#8c5327';
+        ctx.beginPath();
+        ctx.roundRect(-2, -23 - bob, 13, 11, 3);
+        ctx.fill();
+        ctx.strokeStyle = '#f3d79b';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        // Hebilla dorada de la bolsita
+        ctx.fillStyle = '#f3d79b';
+        ctx.fillRect(3, -19 - bob, 3, 3);
+
+        // Cabeza y hocico de señora rata
+        ctx.fillStyle = '#a89b98';
+        ctx.beginPath();
+        ctx.moveTo(-10, -42 - bob);
+        ctx.quadraticCurveTo(-8, -55 - bob, 4, -54 - bob);
+        ctx.lineTo(18, -46 - bob); // Hocico fino hacia adelante
+        ctx.quadraticCurveTo(8, -38 - bob, -10, -40 - bob);
+        ctx.closePath();
+        ctx.fill();
+
+        // Capucha / Pañuelo de viaje color ciruela
+        ctx.fillStyle = '#7e2e46';
+        ctx.beginPath();
+        ctx.moveTo(-14, -36 - bob);
+        ctx.quadraticCurveTo(-15, -58 - bob, 2, -57 - bob);
+        ctx.quadraticCurveTo(6, -50 - bob, -2, -37 - bob);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = '#d4af6a';
+        ctx.lineWidth = 1.1;
+        ctx.stroke();
+
+        // Orejas redondas
+        ctx.fillStyle = '#8f8280';
+        ctx.beginPath();
+        ctx.arc(-5, -55 - bob, 6.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#d1979d';
+        ctx.beginPath();
+        ctx.arc(-4.5, -55 - bob, 3.8, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Ojo oscuro expresivo con brillo
+        ctx.fillStyle = '#141820';
+        ctx.beginPath();
+        ctx.arc(6, -48 - bob, 2.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(6.6, -48.7 - bob, 0.8, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Naricita rosada y bigotes
+        ctx.fillStyle = '#e39ea5';
+        ctx.beginPath();
+        ctx.arc(18, -46 - bob, 2.1, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#efe6d5';
+        ctx.lineWidth = 0.9;
+        ctx.beginPath();
+        ctx.moveTo(15, -45 - bob); ctx.lineTo(24, -47 - bob);
+        ctx.moveTo(15, -44 - bob); ctx.lineTo(24, -42 - bob);
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      /* --- PARTÍCULAS Y VIÑETA ATMOSFÉRICA --- */
+      function drawAtmosphereOverlay(isBrightEnding) {
+        for (const p of ambientParticles) {
+          const alpha = 0.28 + 0.35 * Math.sin(globalTime * 2.5 + p.phase);
+          ctx.fillStyle = (p.warm || isBrightEnding)
+            ? `rgba(243, 215, 155, ${alpha})`
+            : `rgba(155, 210, 235, ${alpha * 0.7})`;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Viñeta suave en los bordes del cuadro
+        const vig = ctx.createRadialGradient(480, 270, 320, 480, 270, 620);
+        vig.addColorStop(0, 'rgba(0,0,0,0)');
+        vig.addColorStop(1, isBrightEnding ? 'rgba(15, 18, 12, 0.35)' : 'rgba(6, 9, 15, 0.62)');
+        ctx.fillStyle = vig;
+        ctx.fillRect(0, 0, 960, 540);
+      }
+
+      /* -------------------------------------------------------------------
+         SECCIÓN F: MOVIMIENTO DE LA PROTAGONISTA E INTERACCIONES
+         ------------------------------------------------------------------- */
+      function clampToWalkable(room, rawX, rawY) {
+        let x = Math.max(room.walkBounds.minX, Math.min(room.walkBounds.maxX, rawX));
+        let y = Math.max(room.walkBounds.minY, Math.min(room.walkBounds.maxY, rawY));
+
+        // Evitar entrar dentro de obstáculos definidos
+        for (const obs of room.obstacles) {
+          if (x > obs.x && x < obs.x + obs.w && y > obs.y && y < obs.y + obs.h) {
+            // Empujar al borde más cercano fuera del obstáculo
+            const distBottom = Math.abs((obs.y + obs.h) - y);
+            const distLeft = Math.abs(x - obs.x);
+            const distRight = Math.abs((obs.x + obs.w) - x);
+            const minD = Math.min(distBottom, distLeft, distRight);
+            if (minD === distBottom) y = obs.y + obs.h + 4;
+            else if (minD === distLeft) x = obs.x - 4;
+            else x = obs.x + obs.w + 4;
+          }
+        }
+        return { x, y };
+      }
+
+      function startWalkingTo(tx, ty, interactable = null) {
+        const room = ROOMS[gameState.currentRoom];
+        const valid = clampToWalkable(room, tx, ty);
+
+        movement.targetX = valid.x;
+        movement.targetY = valid.y;
+        movement.pendingInteractable = interactable;
+
+        const dx = valid.x - gameState.player.x;
+        const dy = valid.y - gameState.player.y;
+        const dist = Math.hypot(dx, dy);
+
+        if (dist < 10) {
+          movement.active = false;
+          if (interactable) {
+            executeInteraction(interactable);
+          }
+          return;
+        }
+
+        if (Math.abs(dx) > 2) {
+          gameState.player.facing = dx >= 0 ? 1 : -1;
+        }
+        movement.active = true;
+      }
+
+      function updateMovement(dt) {
+        if (!movement.active) return;
+
+        const dx = movement.targetX - gameState.player.x;
+        const dy = movement.targetY - gameState.player.y;
+        const dist = Math.hypot(dx, dy);
+
+        if (dist <= movement.speed * dt) {
+          gameState.player.x = movement.targetX;
+          gameState.player.y = movement.targetY;
+          movement.active = false;
+          movement.walkCycle = 0;
+
+          const pending = movement.pendingInteractable;
+          movement.pendingInteractable = null;
+          if (pending) {
+            executeInteraction(pending);
+          }
+        } else {
+          const vx = (dx / dist) * movement.speed;
+          const vy = (dy / dist) * movement.speed;
+          gameState.player.x += vx * dt;
+          gameState.player.y += vy * dt;
+          movement.walkCycle += dt;
+          movement.stepSoundTimer += dt;
+          if (movement.stepSoundTimer >= 0.28) {
+            movement.stepSoundTimer = 0;
+            SoundEngine.playStep();
+          }
+        }
+      }
+
+      function executeInteraction(interactable) {
+        if (selectedItemId) {
+          const usedId = selectedItemId;
+          // Deseleccionar tras intentar usar el objeto
+          selectInventoryItem(null);
+          if (typeof interactable.onUseItem === 'function') {
+            interactable.onUseItem(usedId);
+          }
+        } else {
+          interactable.onInteract();
+        }
+      }
+
+      function getCanvasCoords(evt) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+        const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        return {
+          x: (clientX - rect.left) * scaleX,
+          y: (clientY - rect.top) * scaleY
+        };
+      }
+
+      function findInteractableAt(x, y) {
+        const room = ROOMS[gameState.currentRoom];
+        for (let i = room.interactables.length - 1; i >= 0; i--) {
+          const obj = room.interactables[i];
+          if (
+            x >= obj.box.x &&
+            x <= obj.box.x + obj.box.w &&
+            y >= obj.box.y &&
+            y <= obj.box.y + obj.box.h
+          ) {
+            return obj;
+          }
+        }
+        return null;
+      }
+
+      canvas.addEventListener('pointermove', (evt) => {
+        if (isPaused || isTransitioning || !document.getElementById('dialogue-box').classList.contains('hidden')) {
+          return;
+        }
+        const pos = getCanvasCoords(evt);
+        const found = findInteractableAt(pos.x, pos.y);
+        hoveredInteractable = found;
+        const hintEl = document.getElementById('hover-hint');
+
+        if (found) {
+          canvas.style.cursor = 'pointer';
+          if (selectedItemId) {
+            hintEl.textContent = `Usar ${ITEMS_DB[selectedItemId].name} en: ${found.name}`;
+          } else {
+            hintEl.textContent = found.isExit ? `Ir hacia: ${found.name}` : `Examinar: ${found.name}`;
+          }
+        } else {
+          canvas.style.cursor = 'crosshair';
+          hintEl.textContent = selectedItemId
+            ? `Objeto seleccionado: ${ITEMS_DB[selectedItemId].name} (haz clic en un elemento)`
+            : 'Haz clic en el sendero para caminar o examinar el entorno.';
+        }
+      });
+
+      canvas.addEventListener('pointerdown', (evt) => {
+        if (isPaused || isTransitioning) return;
+        SoundEngine.init();
+
+        // Si hay diálogo abierto, avanzarlo al tocar
+        if (!document.getElementById('dialogue-box').classList.contains('hidden')) {
+          advanceDialogue();
+          return;
+        }
+
+        const pos = getCanvasCoords(evt);
+        const targetObj = findInteractableAt(pos.x, pos.y);
+
+        if (targetObj) {
+          startWalkingTo(targetObj.walkTo.x, targetObj.walkTo.y, targetObj);
+        } else {
+          startWalkingTo(pos.x, pos.y, null);
+        }
+      });
+
+      /* -------------------------------------------------------------------
+         SECCIÓN G: TRANSICIÓN DE HABITACIONES
+         ------------------------------------------------------------------- */
+      function changeRoom(targetRoomId, spawnPos) {
+        if (isTransitioning || !ROOMS[targetRoomId]) return;
+        isTransitioning = true;
+        movement.active = false;
+        movement.pendingInteractable = null;
+        SoundEngine.playTransition();
+
+        const curtain = document.getElementById('fade-curtain');
+        curtain.classList.add('active');
+
+        setTimeout(() => {
+          gameState.currentRoom = targetRoomId;
+          gameState.player.x = spawnPos.x;
+          gameState.player.y = spawnPos.y;
+          gameState.player.facing = spawnPos.facing || 1;
+          hasUnsavedChanges = true;
+          updateRoomHeader();
+
+          setTimeout(() => {
+            curtain.classList.remove('active');
+            isTransitioning = false;
+          }, 160);
+        }, 420);
+      }
+
+      function updateRoomHeader() {
+        const room = ROOMS[gameState.currentRoom];
+        document.getElementById('room-title').textContent = room.name;
+        document.getElementById('hover-hint').textContent = 'Haz clic en el sendero para caminar o examinar el entorno.';
+      }
+
+      /* -------------------------------------------------------------------
+         SECCIÓN H: SISTEMA DE DIÁLOGOS NARRATIVOS
+         ------------------------------------------------------------------- */
+      const dialogueBox = document.getElementById('dialogue-box');
+      const dialogueSpeaker = document.getElementById('dialogue-speaker');
+      const dialogueText = document.getElementById('dialogue-text');
+      const dialoguePortrait = document.getElementById('dialogue-portrait');
+
+      function renderPortraitSVG() {
+        dialoguePortrait.innerHTML = `<svg viewBox="0 0 64 64" width="48" height="48" fill="none">
+          <circle cx="22" cy="22" r="7" fill="#8b7d7b"/>
+          <circle cx="22" cy="22" r="4" fill="#c78d94"/>
+          <circle cx="42" cy="22" r="7" fill="#8b7d7b"/>
+          <circle cx="42" cy="22" r="4" fill="#c78d94"/>
+          <path d="M16 36C16 24 23 17 32 17C41 17 48 24 48 36L51 48H13L16 36Z" fill="#7e2e46"/>
+          <path d="M23 31C23 26 27 23 32 23C37 23 41 26 41 31C41 36 36 41 32 43C28 41 23 36 23 31Z" fill="#a89b98"/>
+          <circle cx="28" cy="31" r="1.8" fill="#151820"/>
+          <circle cx="36" cy="31" r="1.8" fill="#151820"/>
+          <circle cx="32" cy="38" r="1.8" fill="#dfa0a6"/>
+        </svg>`;
+      }
+
+      function showDialogue(entries, callback = null) {
+        activeDialogueQueue = [...entries];
+        onDialogueComplete = callback;
+        renderPortraitSVG();
+        advanceDialogue();
+      }
+
+      function advanceDialogue() {
+        if (activeDialogueQueue.length === 0) {
+          dialogueBox.classList.add('hidden');
+          const cb = onDialogueComplete;
+          onDialogueComplete = null;
+          if (typeof cb === 'function') cb();
+          return;
+        }
+        const current = activeDialogueQueue.shift();
+        dialogueSpeaker.textContent = current.speaker || 'Doña Bruma';
+        dialogueText.textContent = current.text;
+        dialogueBox.classList.remove('hidden');
+      }
+
+      dialogueBox.addEventListener('click', () => {
+        SoundEngine.playClick();
+        advanceDialogue();
+      });
+
+      /* -------------------------------------------------------------------
+         SECCIÓN I: INVENTARIO FUNCIONAL (SELECCIÓN, USO Y COMBINACIÓN)
+         ------------------------------------------------------------------- */
+      function addItemToInventory(itemId) {
+        if (!ITEMS_DB[itemId]) return;
+        if (!gameState.inventory.includes(itemId)) {
+          gameState.inventory.push(itemId);
+          hasUnsavedChanges = true;
+          renderInventoryUI();
+        }
+      }
+
+      function consumeItem(itemId) {
+        const idx = gameState.inventory.indexOf(itemId);
+        if (idx !== -1) {
+          gameState.inventory.splice(idx, 1);
+          if (selectedItemId === itemId) selectedItemId = null;
+          if (combineSourceItemId === itemId) combineSourceItemId = null;
+          hasUnsavedChanges = true;
+          renderInventoryUI();
+        }
+      }
+
+      function selectInventoryItem(itemId) {
+        combineSourceItemId = null;
+        if (selectedItemId === itemId) {
+          selectedItemId = null;
+        } else {
+          selectedItemId = itemId;
+        }
+        renderInventoryUI();
+      }
+
+      function attemptCombineItems(idA, idB) {
+        combineSourceItemId = null;
+        if (idA === idB) {
+          renderInventoryUI();
+          return;
+        }
+
+        const recipe = COMBINATIONS.find(
+          (r) => (r.itemA === idA && r.itemB === idB) || (r.itemA === idB && r.itemB === idA)
+        );
+
+        if (recipe) {
+          consumeItem(idA);
+          consumeItem(idB);
+          addItemToInventory(recipe.result);
+          selectInventoryItem(recipe.result);
+          SoundEngine.playPuzzleSolved();
+          showDialogue([{ speaker: 'Doña Bruma', text: recipe.message }]);
+        } else {
+          SoundEngine.playError();
+          showDialogue([
+            {
+              speaker: 'Doña Bruma',
+              text: `No encuentro forma de unir ${ITEMS_DB[idA].name} con ${ITEMS_DB[idB].name}.`
+            }
+          ]);
+          renderInventoryUI();
+        }
+      }
+
+      function renderInventoryUI() {
+        const slotsContainer = document.getElementById('inventory-slots');
+        const activeBanner = document.getElementById('active-item-banner');
+        const inspName = document.getElementById('inspector-name');
+        const inspDesc = document.getElementById('inspector-desc');
+        const inspActions = document.getElementById('inspector-actions');
+
+        slotsContainer.innerHTML = '';
+        inspActions.innerHTML = '';
+
+        if (gameState.inventory.length === 0) {
+          slotsContainer.innerHTML = '<span class="inv-empty-note">La bolsita aún está vacía.</span>';
+          activeBanner.classList.add('hidden');
+          inspName.textContent = 'Bolsita de cuero vacía';
+          inspDesc.textContent = 'Explora los rincones del bosque para recoger objetos útiles.';
+          return;
+        }
+
+        for (const itemId of gameState.inventory) {
+          const item = ITEMS_DB[itemId];
+          const slot = document.createElement('button');
+          slot.className = 'inv-slot';
+          slot.type = 'button';
+          slot.title = item.name;
+          slot.setAttribute('aria-label', item.name);
+          slot.innerHTML = item.svg;
+
+          if (selectedItemId === itemId) {
+            slot.classList.add('selected');
+          }
+          if (combineSourceItemId && combineSourceItemId !== itemId) {
+            slot.classList.add('combine-target');
+          }
+
+          slot.addEventListener('click', () => {
+            SoundEngine.playClick();
+            if (combineSourceItemId && combineSourceItemId !== itemId) {
+              attemptCombineItems(combineSourceItemId, itemId);
+            } else {
+              selectInventoryItem(itemId);
+            }
+          });
+
+          slotsContainer.appendChild(slot);
+        }
+
+        if (selectedItemId && ITEMS_DB[selectedItemId]) {
+          const item = ITEMS_DB[selectedItemId];
+          activeBanner.classList.remove('hidden');
+          activeBanner.textContent = combineSourceItemId
+            ? `Elige otro objeto para combinar con ${item.name}`
+            : `Seleccionado: ${item.name}`;
+
+          inspName.textContent = item.name;
+          inspDesc.textContent = item.desc;
+
+          // Botón para leer nota si aplica
+          if (item.readable) {
+            const readBtn = document.createElement('button');
+            readBtn.className = 'story-btn tiny-btn primary';
+            readBtn.textContent = 'Leer nota';
+            readBtn.addEventListener('click', () => {
+              SoundEngine.playClick();
+              showDialogue([{ speaker: item.name, text: item.fullText }]);
+            });
+            inspActions.appendChild(readBtn);
+          }
+
+          // Botón para combinar si hay al menos 2 objetos en el inventario
+          if (gameState.inventory.length >= 2) {
+            const combBtn = document.createElement('button');
+            combBtn.className = 'story-btn tiny-btn';
+            combBtn.textContent = combineSourceItemId ? 'Cancelar combinación' : 'Combinar con...';
+            combBtn.addEventListener('click', () => {
+              SoundEngine.playClick();
+              combineSourceItemId = combineSourceItemId ? null : selectedItemId;
+              renderInventoryUI();
+            });
+            inspActions.appendChild(combBtn);
+          }
+
+          // Botón para deseleccionar
+          const deselBtn = document.createElement('button');
+          deselBtn.className = 'story-btn tiny-btn';
+          deselBtn.textContent = 'Guardar en bolsita';
+          deselBtn.addEventListener('click', () => {
+            SoundEngine.playClick();
+            selectInventoryItem(null);
+          });
+          inspActions.appendChild(deselBtn);
+        } else {
+          activeBanner.classList.add('hidden');
+          inspName.textContent = 'Selecciona un objeto';
+          inspDesc.textContent = 'Toca un objeto de tu bolsita para leer su descripción, usarlo en el escenario o combinarlo.';
+        }
+      }
+
+      /* -------------------------------------------------------------------
+         SECCIÓN J: PUZZLE DE CERRADURA NUMÉRICA (4 - 2 - 7)
+         ------------------------------------------------------------------- */
+      const codeModal = document.getElementById('code-puzzle-modal');
+      const codeFeedback = document.getElementById('code-feedback');
+
+      function openCodePuzzleModal() {
+        codeDigits = [0, 0, 0];
+        updateCodeWheelsUI();
+        codeFeedback.textContent = '';
+        codeModal.classList.remove('hidden');
+      }
+
+      function updateCodeWheelsUI() {
+        for (let i = 0; i < 3; i++) {
+          document.getElementById(`wheel-val-${i}`).textContent = codeDigits[i];
+        }
+      }
+
+      document.querySelectorAll('.wheel-arrow').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          SoundEngine.playClick();
+          const idx = Number(btn.dataset.wheel);
+          const dir = Number(btn.dataset.dir);
+          codeDigits[idx] = (codeDigits[idx] + dir + 10) % 10;
+          updateCodeWheelsUI();
+        });
+      });
+
+      document.getElementById('btn-submit-code').addEventListener('click', () => {
+        const entered = codeDigits.join('');
+        if (entered === '427') {
+          gameState.flags.reliquaryUnlocked = true;
+          codeModal.classList.add('hidden');
+          addItemToInventory('heart_crystal');
+          gameState.pickedUp.heart_crystal = true;
+          SoundEngine.playPuzzleSolved();
+          showDialogue([
+            {
+              speaker: 'Doña Bruma',
+              text: 'Los engranajes de bronce encajan con un sonido cristalino. La tapa se abre revelando el Cristal Corazón del Bosque.'
+            }
+          ]);
+        } else {
+          SoundEngine.playError();
+          codeFeedback.style.color = '#e08e9d';
+          codeFeedback.textContent = 'El pestillo no cede. Esa combinación no coincide con las pistas del guardián.';
+        }
+      });
+
+      document.getElementById('btn-cancel-code').addEventListener('click', () => {
+        SoundEngine.playClick();
+        codeModal.classList.add('hidden');
+      });
+
+      /* -------------------------------------------------------------------
+         SECCIÓN K: GUARDADO EN LOCALSTORAGE, OPCIONES, PAUSA Y MENÚS
+         ------------------------------------------------------------------- */
+      function loadSettings() {
+        try {
+          const raw = localStorage.getItem(SETTINGS_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (typeof parsed.sfxEnabled === 'boolean') SoundEngine.sfxEnabled = parsed.sfxEnabled;
+            else if (typeof parsed.enabled === 'boolean') SoundEngine.sfxEnabled = parsed.enabled;
+            if (typeof parsed.musicEnabled === 'boolean') SoundEngine.musicEnabled = parsed.musicEnabled;
+            if (typeof parsed.musicVolume === 'number') SoundEngine.musicVolume = parsed.musicVolume;
+            if (typeof parsed.volume === 'number') SoundEngine.volume = parsed.volume;
+            if (typeof parsed.fontScale === 'number') {
+              document.documentElement.style.setProperty('--font-scale', parsed.fontScale);
+            }
+          }
+        } catch (_) {}
+        syncSettingsUI();
+      }
+
+      function saveSettings() {
+        try {
+          const scale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-scale')) || 1;
+          localStorage.setItem(
+            SETTINGS_KEY,
+            JSON.stringify({
+              sfxEnabled: SoundEngine.sfxEnabled,
+              musicEnabled: SoundEngine.musicEnabled,
+              musicVolume: SoundEngine.musicVolume,
+              volume: SoundEngine.volume,
+              fontScale: scale
+            })
+          );
+        } catch (_) {}
+      }
+
+      function syncSettingsUI() {
+        const toggleMusicBtn = document.getElementById('btn-toggle-music');
+        toggleMusicBtn.textContent = SoundEngine.musicEnabled ? 'Activada' : 'Silenciada';
+        toggleMusicBtn.classList.toggle('primary', SoundEngine.musicEnabled);
+
+        const musicSlider = document.getElementById('music-volume-slider');
+        const musicPct = Math.round(SoundEngine.musicVolume * 100);
+        musicSlider.value = musicPct;
+        document.getElementById('music-volume-label').textContent = `${musicPct}%`;
+
+        const toggleBtn = document.getElementById('btn-toggle-sound');
+        toggleBtn.textContent = SoundEngine.sfxEnabled ? 'Activados' : 'Silenciados';
+        toggleBtn.classList.toggle('primary', SoundEngine.sfxEnabled);
+
+        const slider = document.getElementById('volume-slider');
+        const pct = Math.round(SoundEngine.volume * 100);
+        slider.value = pct;
+        document.getElementById('volume-value-label').textContent = `${pct}%`;
+
+        const currentScale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-scale')) || 1;
+        document.querySelectorAll('#text-size-group .seg-btn').forEach((btn) => {
+          btn.classList.toggle('active', Math.abs(parseFloat(btn.dataset.scale) - currentScale) < 0.02);
+        });
+      }
+
+      function hasSavedGame() {
+        try {
+          const raw = localStorage.getItem(SAVE_KEY);
+          if (!raw) return false;
+          const data = JSON.parse(raw);
+          return Boolean(data && data.currentRoom && ROOMS[data.currentRoom]);
+        } catch (_) {
+          return false;
+        }
+      }
+
+      function updateContinueButtonState() {
+        const btnCont = document.getElementById('btn-continue-game');
+        if (hasSavedGame()) {
+          btnCont.disabled = false;
+          btnCont.textContent = 'Continuar';
+        } else {
+          btnCont.disabled = true;
+          btnCont.textContent = 'Continuar (Sin partida guardada)';
+        }
+      }
+
+      function saveCurrentGame() {
+        try {
+          localStorage.setItem(SAVE_KEY, JSON.stringify(gameState));
+          hasUnsavedChanges = false;
+          updateContinueButtonState();
+          return true;
+        } catch (_) {
+          return false;
+        }
+      }
+
+      function loadSavedGame() {
+        try {
+          const raw = localStorage.getItem(SAVE_KEY);
+          if (!raw) return false;
+          const parsed = JSON.parse(raw);
+          if (!parsed || !ROOMS[parsed.currentRoom]) return false;
+
+          gameState = {
+            currentRoom: parsed.currentRoom,
+            player: {
+              x: Number(parsed.player?.x) || 240,
+              y: Number(parsed.player?.y) || 430,
+              facing: parsed.player?.facing === -1 ? -1 : 1
+            },
+            inventory: Array.isArray(parsed.inventory) ? parsed.inventory.filter((id) => Boolean(ITEMS_DB[id])) : [],
+            pickedUp: parsed.pickedUp || {},
+            flags: Object.assign(createFreshGameState().flags, parsed.flags || {})
+          };
+          hasUnsavedChanges = false;
+          return true;
+        } catch (_) {
+          return false;
+        }
+      }
+
+      // Navegación entre pantallas principales
+      let optionsReturnTarget = 'main-menu-screen';
+
+      function showOnlyScreen(screenId) {
+        const screens = ['main-menu-screen', 'options-screen', 'credits-screen', 'ending-screen', 'game-view'];
+        for (const id of screens) {
+          document.getElementById(id).classList.toggle('hidden', id !== screenId);
+        }
+      }
+
+      function launchGameplay(isNew) {
+        selectedItemId = null;
+        combineSourceItemId = null;
+        movement.active = false;
+        movement.pendingInteractable = null;
+        isPaused = false;
+        document.getElementById('pause-modal').classList.add('hidden');
+        document.getElementById('code-puzzle-modal').classList.add('hidden');
+        document.getElementById('confirm-exit-modal').classList.add('hidden');
+        dialogueBox.classList.add('hidden');
+
+        showOnlyScreen('game-view');
+        updateRoomHeader();
+        renderInventoryUI();
+
+        if (isNew && !gameState.flags.introShown) {
+          gameState.flags.introShown = true;
+          showDialogue([
+            {
+              speaker: 'Doña Bruma',
+              text: 'Al fin he llegado al linde del Bosque del Susurro Nocturno. La niebla se vuelve cada vez más espesa entre estos árboles centenarios.'
+            },
+            {
+              speaker: 'Doña Bruma',
+              text: 'Debo explorar este claro y encontrar la forma de encender el antiguo Faro de Musgo para devolver la luz a los senderos.'
+            }
+          ]);
+        }
+      }
+
+      function triggerGameEnding() {
+        isPaused = true;
+        showOnlyScreen('ending-screen');
+      }
+
+      // Eventos del Menú Principal
+      document.getElementById('btn-new-game').addEventListener('click', () => {
+        SoundEngine.playClick();
+        gameState = createFreshGameState();
+        hasUnsavedChanges = true;
+        launchGameplay(true);
+      });
+
+      document.getElementById('btn-continue-game').addEventListener('click', () => {
+        SoundEngine.playClick();
+        if (loadSavedGame()) {
+          launchGameplay(false);
+        }
+      });
+
+      document.getElementById('btn-open-options').addEventListener('click', () => {
+        SoundEngine.playClick();
+        optionsReturnTarget = 'main-menu-screen';
+        showOnlyScreen('options-screen');
+      });
+
+      document.getElementById('btn-open-credits').addEventListener('click', () => {
+        SoundEngine.playClick();
+        showOnlyScreen('credits-screen');
+      });
+
+      document.getElementById('btn-close-credits').addEventListener('click', () => {
+        SoundEngine.playClick();
+        showOnlyScreen('main-menu-screen');
+      });
+
+      document.getElementById('btn-ending-menu').addEventListener('click', () => {
+        SoundEngine.playClick();
+        isPaused = false;
+        updateContinueButtonState();
+        showOnlyScreen('main-menu-screen');
+      });
+
+      // Eventos de Opciones (Música de fondo, Efectos de sonido, Volumen y Texto)
+      document.getElementById('btn-toggle-music').addEventListener('click', () => {
+        SoundEngine.musicEnabled = !SoundEngine.musicEnabled;
+        SoundEngine.playClick();
+        if (SoundEngine.musicEnabled) {
+          SoundEngine.init();
+          if (!SoundEngine.musicStarted) {
+            SoundEngine.startMusic();
+          } else {
+            SoundEngine.updateMusicGain();
+          }
+        } else {
+          SoundEngine.stopMusic();
+        }
+        syncSettingsUI();
+        saveSettings();
+      });
+
+      document.getElementById('music-volume-slider').addEventListener('input', (evt) => {
+        SoundEngine.musicVolume = Number(evt.target.value) / 100;
+        SoundEngine.init();
+        SoundEngine.updateMusicGain();
+        syncSettingsUI();
+        saveSettings();
+      });
+
+      document.getElementById('btn-toggle-sound').addEventListener('click', () => {
+        SoundEngine.sfxEnabled = !SoundEngine.sfxEnabled;
+        if (SoundEngine.sfxEnabled) SoundEngine.playClick();
+        syncSettingsUI();
+        saveSettings();
+      });
+
+      document.getElementById('volume-slider').addEventListener('input', (evt) => {
+        SoundEngine.volume = Number(evt.target.value) / 100;
+        SoundEngine.updateMusicGain();
+        syncSettingsUI();
+        saveSettings();
+      });
+
+      document.querySelectorAll('#text-size-group .seg-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          SoundEngine.playClick();
+          document.documentElement.style.setProperty('--font-scale', btn.dataset.scale);
+          syncSettingsUI();
+          saveSettings();
+        });
+      });
+
+      document.getElementById('btn-close-options').addEventListener('click', () => {
+        SoundEngine.playClick();
+        showOnlyScreen(optionsReturnTarget);
+      });
+
+      // Eventos del Menú de Pausa
+      const pauseModal = document.getElementById('pause-modal');
+      const pauseFeedback = document.getElementById('pause-feedback');
+
+      document.getElementById('btn-pause').addEventListener('click', () => {
+        SoundEngine.playClick();
+        isPaused = true;
+        pauseFeedback.textContent = '';
+        pauseModal.classList.remove('hidden');
+      });
+
+      document.getElementById('btn-resume-game').addEventListener('click', () => {
+        SoundEngine.playClick();
+        pauseModal.classList.add('hidden');
+        isPaused = false;
+      });
+
+      document.getElementById('btn-save-game').addEventListener('click', () => {
+        const ok = saveCurrentGame();
+        if (ok) {
+          SoundEngine.playPickup();
+          pauseFeedback.style.color = '#8ee0b1';
+          pauseFeedback.textContent = 'Progreso guardado correctamente en el diario.';
+        } else {
+          SoundEngine.playError();
+          pauseFeedback.style.color = '#e08e9d';
+          pauseFeedback.textContent = 'No se pudo acceder al almacenamiento del navegador.';
+        }
+      });
+
+      document.getElementById('btn-pause-options').addEventListener('click', () => {
+        SoundEngine.playClick();
+        pauseModal.classList.add('hidden');
+        optionsReturnTarget = 'game-view';
+        showOnlyScreen('options-screen');
+      });
+
+      document.getElementById('btn-exit-to-menu').addEventListener('click', () => {
+        SoundEngine.playClick();
+        pauseModal.classList.add('hidden');
+        if (hasUnsavedChanges) {
+          document.getElementById('confirm-exit-modal').classList.remove('hidden');
+        } else {
+          isPaused = false;
+          updateContinueButtonState();
+          showOnlyScreen('main-menu-screen');
+        }
+      });
+
+      // Eventos de Confirmación de Salida sin Guardar
+      document.getElementById('btn-save-and-exit').addEventListener('click', () => {
+        saveCurrentGame();
+        SoundEngine.playClick();
+        document.getElementById('confirm-exit-modal').classList.add('hidden');
+        isPaused = false;
+        updateContinueButtonState();
+        showOnlyScreen('main-menu-screen');
+      });
+
+      document.getElementById('btn-discard-and-exit').addEventListener('click', () => {
+        SoundEngine.playClick();
+        document.getElementById('confirm-exit-modal').classList.add('hidden');
+        isPaused = false;
+        updateContinueButtonState();
+        showOnlyScreen('main-menu-screen');
+      });
+
+      document.getElementById('btn-cancel-exit').addEventListener('click', () => {
+        SoundEngine.playClick();
+        document.getElementById('confirm-exit-modal').classList.add('hidden');
+        isPaused = false;
+      });
+
+      // Inicialización al cargar la página
+      loadSettings();
+      updateContinueButtonState();
+      requestAnimationFrame(renderLoop);
+    })();
+  </script>
+</body>
+</html>
